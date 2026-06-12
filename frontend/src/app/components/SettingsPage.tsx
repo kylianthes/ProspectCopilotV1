@@ -12,19 +12,19 @@ type Tab = "ia" | "apparence" | "donnees";
 const TABS: { id: Tab; label: string; icon: React.ComponentType<{ size?: number }> }[] = [
   { id: "ia",         label: "Moteur IA",  icon: Cpu },
   { id: "apparence",  label: "Apparence",  icon: Palette },
-  { id: "donnees",    label: "DonnÃ©es",    icon: Database },
+  { id: "donnees",    label: "Données",    icon: Database },
 ];
 
 const MODELS = ["llama3.1:8b", "llama3.1:70b", "llama3.2:3b", "mistral:7b", "mixtral:8x7b", "phi3:mini", "gemma2:9b"];
 const TONES: { value: MessageTone; label: string; desc: string }[] = [
   { value: "professionnel", label: "Professionnel", desc: "Formel, B2B, respectueux" },
-  { value: "amical",        label: "Amical",        desc: "DÃ©contractÃ©, accessible" },
-  { value: "direct",        label: "Direct",        desc: "Court, orientÃ© action" },
+  { value: "amical",        label: "Amical",        desc: "Décontracté, accessible" },
+  { value: "direct",        label: "Direct",        desc: "Court, orienté action" },
   { value: "chaleureux",    label: "Chaleureux",    desc: "Personnel, empathique" },
 ];
 const MSG_TYPES: { value: MessageType; label: string }[] = [
   { value: "email",    label: "Email" },
-  { value: "dm",       label: "DM (rÃ©seau social)" },
+  { value: "dm",       label: "DM (réseau social)" },
 ];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -80,7 +80,7 @@ export function SettingsPage({ settings, onSave }: Props) {
 
       {/* Left tab nav */}
       <div style={{ width: 200, flexShrink: 0, background: "#0C1220", borderRight: "1px solid rgba(255,255,255,0.045)", padding: "24px 10px" }}>
-        <div style={{ fontSize: 9, color: "#1E2D45", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase", padding: "0 10px", marginBottom: 10 }}>ParamÃ¨tres</div>
+        <div style={{ fontSize: 9, color: "#1E2D45", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase", padding: "0 10px", marginBottom: 10 }}>Paramètres</div>
         {TABS.map(t => {
           const active = tab === t.id;
           const Icon = t.icon;
@@ -104,13 +104,13 @@ export function SettingsPage({ settings, onSave }: Props) {
             <p style={{ color: "#4A5568", fontSize: 12.5, margin: "3px 0 0" }}>Configurez Prospect Copilot</p>
           </div>
           <button onClick={handleSave} style={{ display: "flex", alignItems: "center", gap: 7, background: saved ? "rgba(0,255,163,0.12)" : "linear-gradient(135deg, #00D4FF 0%, #0094CC 100%)", color: saved ? "#00FFA3" : "#0A0E17", border: saved ? "1px solid rgba(0,255,163,0.25)" : "none", borderRadius: 9, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}>
-            {saved ? <Check size={14} /> : <Save size={14} />} {saved ? "SauvegardÃ© âœ“" : "Sauvegarder"}
+            {saved ? <Check size={14} /> : <Save size={14} />} {saved ? "Sauvegardé ?" : "Sauvegarder"}
           </button>
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
 
-          {/* â”€â”€ IA TAB â”€â”€ */}
+          {/* -- IA TAB -- */}
           {tab === "ia" && (
             <>
               <Section title="Connexion Ollama">
@@ -123,12 +123,12 @@ export function SettingsPage({ settings, onSave }: Props) {
                     />
                     <button onClick={testConnection} style={{ display: "flex", alignItems: "center", gap: 5, background: testStatus === "ok" ? "rgba(0,255,163,0.1)" : testStatus === "fail" ? "rgba(255,77,106,0.1)" : "rgba(255,255,255,0.05)", color: testStatus === "ok" ? "#00FFA3" : testStatus === "fail" ? "#FF4D6A" : "#6B7A99", border: `1px solid ${testStatus === "ok" ? "rgba(0,255,163,0.2)" : testStatus === "fail" ? "rgba(255,77,106,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
                       {testStatus === "testing" ? <RefreshCw size={12} style={{ animation: "spin 1s linear infinite" }} /> : testStatus === "ok" ? <Check size={12} /> : testStatus === "fail" ? <AlertTriangle size={12} /> : null}
-                      {testStatus === "idle" ? "Tester" : testStatus === "testing" ? "Testâ€¦" : testStatus === "ok" ? "ConnectÃ©" : "Erreur"}
+                      {testStatus === "idle" ? "Tester" : testStatus === "testing" ? "Test..." : testStatus === "ok" ? "Connecté" : "Erreur"}
                     </button>
                     <style>{`@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }`}</style>
                   </div>
                 } />
-                <Row label="ModÃ¨le" description="ModÃ¨le Ollama Ã  utiliser pour l'analyse et la gÃ©nÃ©ration" right={
+                <Row label="Modèle" description="Modèle Ollama Ã  utiliser pour l'analyse et la génération" right={
                   <select value={local.model} onChange={e => patch({ model: e.target.value })}
                     style={{ width: 200, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#E8EDF5", fontSize: 12.5, outline: "none", fontFamily: "'JetBrains Mono', monospace" }}>
                     {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
@@ -136,8 +136,8 @@ export function SettingsPage({ settings, onSave }: Props) {
                 } divider={false} />
               </Section>
 
-              <Section title="ParamÃ¨tres de gÃ©nÃ©ration">
-                <Row label="TempÃ©rature" description="CrÃ©ativitÃ© du modÃ¨le (0 = dÃ©terministe, 1 = crÃ©atif)" right={
+              <Section title="Paramètres de génération">
+                <Row label="Température" description="Créativité du modèle (0 = déterministe, 1 = créatif)" right={
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <input type="range" min={0} max={1} step={0.1} value={local.temperature}
                       onChange={e => patch({ temperature: parseFloat(e.target.value) })}
@@ -145,7 +145,7 @@ export function SettingsPage({ settings, onSave }: Props) {
                     <span style={{ fontSize: 13, color: "#00D4FF", fontFamily: "'JetBrains Mono', monospace", width: 28, textAlign: "center" }}>{local.temperature}</span>
                   </div>
                 } />
-                <Row label="Max tokens" description="Longueur maximale des messages gÃ©nÃ©rÃ©s" right={
+                <Row label="Max tokens" description="Longueur maximale des messages générés" right={
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <input type="number" value={local.maxTokens} min={100} max={2000} onChange={e => patch({ maxTokens: Number(e.target.value) })}
                       style={{ width: 80, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "6px 10px", color: "#E8EDF5", fontSize: 13, outline: "none", textAlign: "center", fontFamily: "'JetBrains Mono', monospace" }}
@@ -157,8 +157,8 @@ export function SettingsPage({ settings, onSave }: Props) {
                 } divider={false} />
               </Section>
 
-              <Section title="Defaults de gÃ©nÃ©ration">
-                <Row label="Ton par dÃ©faut" description="Ton utilisÃ© si non spÃ©cifiÃ© manuellement" right={
+              <Section title="Defaults de génération">
+                <Row label="Ton par défaut" description="Ton utilisé si non spécifié manuellement" right={
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     {TONES.map(t => (
                       <button key={t.value} onClick={() => patch({ defaultTone: t.value })}
@@ -168,7 +168,7 @@ export function SettingsPage({ settings, onSave }: Props) {
                     ))}
                   </div>
                 } />
-                <Row label="Type de message par dÃ©faut" right={
+                <Row label="Type de message par défaut" right={
                   <div style={{ display: "flex", gap: 6 }}>
                     {MSG_TYPES.map(t => (
                       <button key={t.value} onClick={() => patch({ defaultMessageType: t.value })}
@@ -182,10 +182,10 @@ export function SettingsPage({ settings, onSave }: Props) {
             </>
           )}
 
-          {/* â”€â”€ APPARENCE TAB â”€â”€ */}
+          {/* -- APPARENCE TAB -- */}
           {tab === "apparence" && (
-            <Section title="ThÃ¨me">
-              <Row label="ThÃ¨me" description="Seul le thÃ¨me sombre est disponible pour l'instant" right={
+            <Section title="Thème">
+              <Row label="Thème" description="Seul le thème sombre est disponible pour l'instant" right={
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ display: "flex", gap: 4 }}>
                     {["#090D18","#0F1117","#00D4FF","#00FFA3"].map(c => <div key={c} style={{ width: 16, height: 16, borderRadius: 4, background: c, border: "1px solid rgba(255,255,255,0.1)" }} />)}
@@ -193,7 +193,7 @@ export function SettingsPage({ settings, onSave }: Props) {
                   <span style={{ fontSize: 12.5, color: "#00D4FF", background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.2)", borderRadius: 6, padding: "3px 10px" }}>Cyber Dark</span>
                 </div>
               } />
-              <Row label="Police interface" description="Inter pour l'UI, JetBrains Mono pour les donnÃ©es" right={
+              <Row label="Police interface" description="Inter pour l'UI, JetBrains Mono pour les données" right={
                 <div style={{ display: "flex", gap: 6 }}>
                   <span style={{ fontSize: 12.5, color: "#D1D9E6", background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "3px 10px" }}>Inter</span>
                   <span style={{ fontSize: 12, color: "#6B7A99", background: "rgba(255,255,255,0.03)", borderRadius: 6, padding: "3px 10px", fontFamily: "'JetBrains Mono', monospace" }}>JetBrains Mono</span>
@@ -202,14 +202,14 @@ export function SettingsPage({ settings, onSave }: Props) {
             </Section>
           )}
 
-          {/* â”€â”€ DONNÃ‰ES TAB â”€â”€ */}
+          {/* -- DONNÉES TAB -- */}
           {tab === "donnees" && (
             <>
               <Section title="Stockage local">
-                <Row label="Emplacement des donnÃ©es" description="Les donnÃ©es restent sur votre machine (aucun cloud)" right={
+                <Row label="Emplacement des données" description="Les données restent sur votre machine (aucun cloud)" right={
                   <span style={{ fontSize: 12, color: "#00FFA3", background: "rgba(0,255,163,0.08)", borderRadius: 6, padding: "3px 10px" }}>Local uniquement</span>
                 } />
-                <Row label="Prospects enregistrÃ©s" right={
+                <Row label="Prospects enregistrés" right={
                   <button style={{ fontSize: 12.5, color: "#00D4FF", background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.18)", borderRadius: 7, padding: "5px 12px", cursor: "pointer" }}>Exporter JSON</button>
                 } />
                 <Row label="Import CSV" description="Importer une liste de prospects depuis un fichier CSV" right={
@@ -218,8 +218,8 @@ export function SettingsPage({ settings, onSave }: Props) {
               </Section>
 
               <Section title="Danger">
-                <Row label="RÃ©initialiser toutes les donnÃ©es" description="Supprime dÃ©finitivement tous les prospects, messages et paramÃ¨tres" right={
-                  <button style={{ background: "rgba(255,77,106,0.1)", color: "#FF4D6A", border: "1px solid rgba(255,77,106,0.2)", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, cursor: "pointer" }}>RÃ©initialiser</button>
+                <Row label="Réinitialiser toutes les données" description="Supprime définitivement tous les prospects, messages et paramètres" right={
+                  <button style={{ background: "rgba(255,77,106,0.1)", color: "#FF4D6A", border: "1px solid rgba(255,77,106,0.2)", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, cursor: "pointer" }}>Réinitialiser</button>
                 } divider={false} />
               </Section>
             </>

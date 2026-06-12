@@ -11,14 +11,14 @@ type FilterTab = "all" | "draft" | "validated" | "sent" | "rejected";
 
 const STATUS_META: Record<ProspectStatus, { label: string; color: string; bg: string; icon: React.ComponentType<{ size?: number }> }> = {
   new:        { label: "Nouveau",       color: "#8895A7", bg: "rgba(136,149,167,0.1)",  icon: Clock },
-  analyzing:  { label: "Analyseâ€¦",     color: "#00D4FF", bg: "rgba(0,212,255,0.1)",    icon: Clock },
-  analyzed:   { label: "AnalysÃ©",       color: "#00D4FF", bg: "rgba(0,212,255,0.1)",    icon: CheckCircle },
-  generating: { label: "GÃ©nÃ©rationâ€¦",  color: "#7C6AF7", bg: "rgba(124,106,247,0.1)",  icon: Clock },
-  draft:      { label: "Ã€ valider",    color: "#FFB800", bg: "rgba(255,184,0,0.1)",    icon: Clock },
-  validated:  { label: "ValidÃ©",        color: "#00FFA3", bg: "rgba(0,255,163,0.1)",    icon: CheckCircle },
-  sent:       { label: "EnvoyÃ©",        color: "#00FFA3", bg: "rgba(0,255,163,0.08)",   icon: CheckCircle },
-  rejected:   { label: "RejetÃ©",        color: "#FF4D6A", bg: "rgba(255,77,106,0.08)",  icon: X },
-  archived:   { label: "ArchivÃ©",       color: "#3D4E6B", bg: "rgba(61,78,107,0.12)",   icon: SkipForward },
+  analyzing:  { label: "Analyse...",     color: "#00D4FF", bg: "rgba(0,212,255,0.1)",    icon: Clock },
+  analyzed:   { label: "Analysé",       color: "#00D4FF", bg: "rgba(0,212,255,0.1)",    icon: CheckCircle },
+  generating: { label: "Génération...",  color: "#7C6AF7", bg: "rgba(124,106,247,0.1)",  icon: Clock },
+  draft:      { label: "À valider",    color: "#FFB800", bg: "rgba(255,184,0,0.1)",    icon: Clock },
+  validated:  { label: "Validé",        color: "#00FFA3", bg: "rgba(0,255,163,0.1)",    icon: CheckCircle },
+  sent:       { label: "Envoyé",        color: "#00FFA3", bg: "rgba(0,255,163,0.08)",   icon: CheckCircle },
+  rejected:   { label: "Rejeté",        color: "#FF4D6A", bg: "rgba(255,77,106,0.08)",  icon: X },
+  archived:   { label: "Archivé",       color: "#3D4E6B", bg: "rgba(61,78,107,0.12)",   icon: SkipForward },
 };
 
 const TONE_LABELS: Record<MessageTone, string> = { professionnel: "Professionnel", amical: "Amical", direct: "Direct", chaleureux: "Chaleureux" };
@@ -26,10 +26,10 @@ const TYPE_LABELS: Record<MessageType, string> = { email: "Email", dm: "DM" };
 
 const TABS: { id: FilterTab; label: string; statuses: ProspectStatus[] }[] = [
   { id: "all",       label: "Tous",     statuses: ["draft","validated","sent","rejected"] },
-  { id: "draft",     label: "Ã€ valider", statuses: ["draft"] },
-  { id: "validated", label: "ValidÃ©s",  statuses: ["validated"] },
-  { id: "sent",      label: "EnvoyÃ©s",  statuses: ["sent"] },
-  { id: "rejected",  label: "RejetÃ©s",  statuses: ["rejected"] },
+  { id: "draft",     label: "À valider", statuses: ["draft"] },
+  { id: "validated", label: "Validés",  statuses: ["validated"] },
+  { id: "sent",      label: "Envoyés",  statuses: ["sent"] },
+  { id: "rejected",  label: "Rejetés",  statuses: ["rejected"] },
 ];
 
 export function MessagesPage({ prospects, onUpdate }: Props) {
@@ -82,13 +82,13 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             <h1 style={{ color: "#E8EDF5", fontSize: 20, fontWeight: 600, letterSpacing: "-0.02em", margin: 0 }}>Messages</h1>
-            <p style={{ color: "#4A5568", fontSize: 13, margin: "4px 0 0" }}>Validation humaine des messages gÃ©nÃ©rÃ©s par l'IA</p>
+            <p style={{ color: "#4A5568", fontSize: 13, margin: "4px 0 0" }}>Validation humaine des messages générés par l'IA</p>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             {[
-              { label: "Ã€ valider", value: counts.draft,     color: "#FFB800" },
-              { label: "ValidÃ©s",   value: counts.validated, color: "#00FFA3" },
-              { label: "EnvoyÃ©s",   value: counts.sent,      color: "#00D4FF" },
+              { label: "À valider", value: counts.draft,     color: "#FFB800" },
+              { label: "Validés",   value: counts.validated, color: "#00FFA3" },
+              { label: "Envoyés",   value: counts.sent,      color: "#00D4FF" },
             ].map(s => (
               <div key={s.label} style={{ background: "#111926", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 9, padding: "7px 14px", textAlign: "center" }}>
                 <div style={{ fontSize: 16, color: s.color, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{s.value}</div>
@@ -123,7 +123,7 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
           <div style={{ flex: 1, overflowY: "auto" }}>
             {filtered.length === 0 && (
               <div style={{ textAlign: "center", padding: "40px 16px", color: "#3D4E6B", fontSize: 13 }}>
-                {activeTab === "draft" ? "Aucun message Ã  valider" : "Aucun message dans cette catÃ©gorie"}
+                {activeTab === "draft" ? "Aucun message Ã  valider" : "Aucun message dans cette catégorie"}
               </div>
             )}
             {filtered.map(p => {
@@ -148,8 +148,8 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
                       </div>
                     </div>
                     <div style={{ fontSize: 11, color: "#3D4E6B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {p.messageTone && TONE_LABELS[p.messageTone]} Â· {p.messageType && TYPE_LABELS[p.messageType]}
-                      {p.generatedMessage && ` Â· "${p.generatedMessage.split("\n")[0].slice(0,25)}â€¦"`}
+                      {p.messageTone && TONE_LABELS[p.messageTone]} · {p.messageType && TYPE_LABELS[p.messageType]}
+                      {p.generatedMessage && ` · "${p.generatedMessage.split("\n")[0].slice(0,25)}..."`}
                     </div>
                   </div>
                 </div>
@@ -187,7 +187,7 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
 
             {/* Message body */}
             <div style={{ flex: 1, padding: "20px 26px", overflowY: "auto" }}>
-              <div style={{ fontSize: 10.5, color: "#3D4E6B", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>Message personnalisÃ©</div>
+              <div style={{ fontSize: 10.5, color: "#3D4E6B", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>Message personnalisé</div>
 
               {editing ? (
                 <>
@@ -212,13 +212,13 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
             {/* Action bar */}
             <div style={{ padding: "14px 26px", borderTop: "1px solid rgba(255,255,255,0.045)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               <div style={{ fontSize: 12, color: "#3D4E6B", flex: 1 }}>
-                {selected.status === "validated" ? "âœ“ Message approuvÃ© â€” prÃªt Ã  Ãªtre envoyÃ© manuellement" :
-                 selected.status === "sent"       ? "âœ“ Message marquÃ© comme envoyÃ©" :
-                 selected.status === "rejected"   ? "Message rejetÃ© â€” Ã  rÃ©gÃ©nÃ©rer si besoin" :
-                 "Examinez le message ci-dessus et prenez une dÃ©cision."}
+                {selected.status === "validated" ? "? Message approuvé - prêt Ã  être envoyé manuellement" :
+                 selected.status === "sent"       ? "? Message marqué comme envoyé" :
+                 selected.status === "rejected"   ? "Message rejeté - Ã  régénérer si besoin" :
+                 "Examinez le message ci-dessus et prenez une décision."}
               </div>
               <button onClick={handleCopy} style={{ display: "flex", alignItems: "center", gap: 6, background: copied ? "rgba(0,255,163,0.1)" : "rgba(255,255,255,0.04)", color: copied ? "#00FFA3" : "#8895A7", border: `1px solid ${copied ? "rgba(0,255,163,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, padding: "9px 14px", fontSize: 12.5, cursor: "pointer" }}>
-                {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "CopiÃ© !" : "Copier"}
+                {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copié !" : "Copier"}
               </button>
               {selected.status === "draft" && (
                 <>
@@ -232,7 +232,7 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
               )}
               {selected.status === "validated" && (
                 <button onClick={handleMarkSent} style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(135deg, #00D4FF 0%, #0094CC 100%)", color: "#0A0E17", border: "none", borderRadius: 9, padding: "9px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 0 14px rgba(0,212,255,0.2)" }}>
-                  Marquer comme envoyÃ©
+                  Marquer comme envoyé
                 </button>
               )}
             </div>
@@ -241,7 +241,7 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ textAlign: "center" }}>
               <MessageSquare size={32} style={{ color: "#2D3D5A", marginBottom: 12 }} />
-              <div style={{ fontSize: 14, color: "#3D4E6B" }}>SÃ©lectionnez un message Ã  valider</div>
+              <div style={{ fontSize: 14, color: "#3D4E6B" }}>Sélectionnez un message Ã  valider</div>
             </div>
           </div>
         )}

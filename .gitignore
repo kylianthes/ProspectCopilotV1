@@ -9,3 +9,5 @@ dist/
 .env
 work/
 outputs/
+frontend/src-tauri/target/
+frontend/src-tauri/gen/

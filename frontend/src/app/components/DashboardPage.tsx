@@ -9,14 +9,14 @@ interface Props {
 
 const STATUS_META: Record<ProspectStatus, { label: string; color: string; bg: string }> = {
   new:        { label: "Nouveau",       color: "#8895A7", bg: "rgba(136,149,167,0.1)" },
-  analyzing:  { label: "Analyse IAâ€¦",  color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
-  analyzed:   { label: "AnalysÃ©",       color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
-  generating: { label: "GÃ©nÃ©rationâ€¦",  color: "#7C6AF7", bg: "rgba(124,106,247,0.1)" },
-  draft:      { label: "Message prÃªt", color: "#FFB800", bg: "rgba(255,184,0,0.1)"   },
-  validated:  { label: "ValidÃ©",        color: "#00FFA3", bg: "rgba(0,255,163,0.1)"   },
-  sent:       { label: "EnvoyÃ©",        color: "#00FFA3", bg: "rgba(0,255,163,0.08)"  },
-  rejected:   { label: "RejetÃ©",        color: "#FF4D6A", bg: "rgba(255,77,106,0.08)" },
-  archived:   { label: "ArchivÃ©",       color: "#3D4E6B", bg: "rgba(61,78,107,0.12)"  },
+  analyzing:  { label: "Analyse IA...",  color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
+  analyzed:   { label: "Analysé",       color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
+  generating: { label: "Génération...",  color: "#7C6AF7", bg: "rgba(124,106,247,0.1)" },
+  draft:      { label: "Message prêt", color: "#FFB800", bg: "rgba(255,184,0,0.1)"   },
+  validated:  { label: "Validé",        color: "#00FFA3", bg: "rgba(0,255,163,0.1)"   },
+  sent:       { label: "Envoyé",        color: "#00FFA3", bg: "rgba(0,255,163,0.08)"  },
+  rejected:   { label: "Rejeté",        color: "#FF4D6A", bg: "rgba(255,77,106,0.08)" },
+  archived:   { label: "Archivé",       color: "#3D4E6B", bg: "rgba(61,78,107,0.12)"  },
 };
 
 function scoreColor(s: number) {
@@ -77,9 +77,9 @@ export function DashboardPage({ prospects, onNavigate, onAddProspect }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Total prospects",    value: total,     color: "#E8EDF5", sub: `+${newCount} nouveaux`,       icon: <Users size={14} /> },
-          { label: "AnalysÃ©s par IA",    value: analyzed,  color: "#00D4FF", sub: `${analyzeRate}% du total`,    icon: <Brain size={14} /> },
-          { label: "Ã€ valider",          value: draftCount, color: "#FFB800", sub: "Messages en attente",        icon: <MessageSquare size={14} /> },
-          { label: "EnvoyÃ©s (manuel)",   value: sent,      color: "#00FFA3", sub: `${convRate}% conversion`,     icon: <CheckCircle size={14} /> },
+          { label: "Analysés par IA",    value: analyzed,  color: "#00D4FF", sub: `${analyzeRate}% du total`,    icon: <Brain size={14} /> },
+          { label: "À valider",          value: draftCount, color: "#FFB800", sub: "Messages en attente",        icon: <MessageSquare size={14} /> },
+          { label: "Envoyés (manuel)",   value: sent,      color: "#00FFA3", sub: `${convRate}% conversion`,     icon: <CheckCircle size={14} /> },
         ].map(kpi => (
           <div key={kpi.label} style={{ background: "#111926", border: "1px solid rgba(255,255,255,0.055)", borderRadius: 12, padding: "16px 18px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -96,23 +96,23 @@ export function DashboardPage({ prospects, onNavigate, onAddProspect }: Props) {
         <div style={{ background: "#111926", border: "1px solid rgba(255,255,255,0.055)", borderRadius: 12, padding: "18px 20px" }}>
           <div style={{ fontSize: 11, color: "#6B7A99", fontWeight: 500, marginBottom: 16 }}>Entonnoir de conversion</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <FunnelStep label="AjoutÃ©s"         count={total}     color="#8895A7" total={total} />
-            <FunnelStep label="AnalysÃ©s IA"     count={analyzed}  color="#00D4FF" total={total} onClick={() => onNavigate("prospects")} />
-            <FunnelStep label="Message gÃ©nÃ©rÃ©"  count={drafted}   color="#7C6AF7" total={total} onClick={() => onNavigate("messages")} />
-            <FunnelStep label="ValidÃ© humain"   count={validated} color="#FFB800" total={total} onClick={() => onNavigate("messages")} />
-            <FunnelStep label="EnvoyÃ©"          count={sent}      color="#00FFA3" total={total} />
+            <FunnelStep label="Ajoutés"         count={total}     color="#8895A7" total={total} />
+            <FunnelStep label="Analysés IA"     count={analyzed}  color="#00D4FF" total={total} onClick={() => onNavigate("prospects")} />
+            <FunnelStep label="Message généré"  count={drafted}   color="#7C6AF7" total={total} onClick={() => onNavigate("messages")} />
+            <FunnelStep label="Validé humain"   count={validated} color="#FFB800" total={total} onClick={() => onNavigate("messages")} />
+            <FunnelStep label="Envoyé"          count={sent}      color="#00FFA3" total={total} />
           </div>
         </div>
 
         <div style={{ background: "#111926", border: "1px solid rgba(255,255,255,0.055)", borderRadius: 12, padding: "18px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6B7A99", fontWeight: 500, marginBottom: 16 }}>Flow recommandÃ©</div>
+          <div style={{ fontSize: 11, color: "#6B7A99", fontWeight: 500, marginBottom: 16 }}>Flow recommandé</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {[
               { step: "01", label: "Ajouter un prospect",   sub: "Manuel ou import CSV",             color: "#8895A7", act: onAddProspect },
-              { step: "02", label: "Analyser avec IA",      sub: "Score 0-100 + rÃ©sumÃ© + catÃ©gorie", color: "#00D4FF", act: () => onNavigate("prospects") },
-              { step: "03", label: "GÃ©nÃ©rer le message",    sub: "Ton configurable, email ou DM",    color: "#7C6AF7", act: () => onNavigate("prospects") },
-              { step: "04", label: "Valider ou modifier",   sub: "Ã‰diter, Approuver, Rejeter",       color: "#FFB800", act: () => onNavigate("messages") },
-              { step: "05", label: "Envoyer manuellement",  sub: "Copiez le message validÃ©",         color: "#00FFA3", act: undefined as (() => void) | undefined },
+              { step: "02", label: "Analyser avec IA",      sub: "Score 0-100 + résumé + catégorie", color: "#00D4FF", act: () => onNavigate("prospects") },
+              { step: "03", label: "Générer le message",    sub: "Ton configurable, email ou DM",    color: "#7C6AF7", act: () => onNavigate("prospects") },
+              { step: "04", label: "Valider ou modifier",   sub: "Éditer, Approuver, Rejeter",       color: "#FFB800", act: () => onNavigate("messages") },
+              { step: "05", label: "Envoyer manuellement",  sub: "Copiez le message validé",         color: "#00FFA3", act: undefined as (() => void) | undefined },
             ].map((s, i) => (
               <div key={s.step} style={{ display: "flex", gap: 12, paddingBottom: i < 4 ? 14 : 0, position: "relative" }}>
                 {i < 4 && <div style={{ position: "absolute", left: 13, top: 26, width: 1, height: "calc(100% - 12px)", background: "rgba(255,255,255,0.04)" }} />}
@@ -132,7 +132,7 @@ export function DashboardPage({ prospects, onNavigate, onAddProspect }: Props) {
 
       <div style={{ background: "#111926", border: "1px solid rgba(255,255,255,0.055)", borderRadius: 12, padding: "18px 20px", marginBottom: draftCount > 0 ? 16 : 0 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: 11, color: "#6B7A99", fontWeight: 500 }}>Prospects rÃ©cents</div>
+          <div style={{ fontSize: 11, color: "#6B7A99", fontWeight: 500 }}>Prospects récents</div>
           <button onClick={() => onNavigate("prospects")} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: "#3D4E6B", fontSize: 11, cursor: "pointer", padding: 0 }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#00D4FF"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#3D4E6B"; }}
@@ -150,7 +150,7 @@ export function DashboardPage({ prospects, onNavigate, onAddProspect }: Props) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span style={{ fontSize: 13, color: "#D1D9E6", fontWeight: 500 }}>{p.name}</span>
-                      {p.company && <span style={{ fontSize: 11, color: "#3D4E6B" }}>Â· {p.company}</span>}
+                      {p.company && <span style={{ fontSize: 11, color: "#3D4E6B" }}>· {p.company}</span>}
                     </div>
                     <div style={{ fontSize: 11, color: "#4A5568", marginTop: 2 }}>{p.niche}</div>
                   </div>

@@ -26,6 +26,11 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": []
+    "externalBin": [
+      "binaries/prospect-copilot-backend"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ]
   }
 }

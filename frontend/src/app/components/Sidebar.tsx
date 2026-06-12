@@ -6,7 +6,7 @@ const NAV = [
   { id: "dashboard"     as Page, label: "Dashboard",     icon: Home },
   { id: "prospects"     as Page, label: "Prospects",     icon: Users },
   { id: "messages"      as Page, label: "Messages",      icon: MessageSquare },
-  { id: "settings"      as Page, label: "ParamÃ¨tres",    icon: Settings },
+  { id: "settings"      as Page, label: "Paramètres",    icon: Settings },
 ];
 
 interface Props {
@@ -28,7 +28,7 @@ export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, ai
           <Logo size={32} />
           <div>
             <div style={{ color: "#E8EDF5", fontWeight: 700, fontSize: 13.5, letterSpacing: "-0.01em" }}>Prospect Copilot</div>
-            <div style={{ color: "#00D4FF", fontSize: 9, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", opacity: 0.7 }}>MVP Â· IA LOCALE</div>
+            <div style={{ color: "#00D4FF", fontSize: 9, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.1em", opacity: 0.7 }}>MVP · IA LOCALE</div>
           </div>
         </div>
       </div>
@@ -64,7 +64,7 @@ export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, ai
           {[
             { v: totalCount, label: "Total",     color: "#E8EDF5" },
             { v: newCount,   label: "Nouveaux",  color: "#FFB800" },
-            { v: draftCount, label: "Ã€ valider", color: "#00D4FF" },
+            { v: draftCount, label: "À valider", color: "#00D4FF" },
           ].map(s => (
             <div key={s.label} style={{ textAlign: "center" }}>
               <div style={{ fontSize: 16, color: s.color, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>{s.v}</div>
@@ -82,7 +82,7 @@ export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, ai
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <Cpu size={12} style={{ color: aiOnline ? "#00FFA3" : "#FF4D6A", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 11, color: aiOnline ? "#00FFA3" : "#FF4D6A", fontWeight: 500 }}>{aiOnline ? "Ollama connectÃ©" : "Ollama hors ligne"}</div>
+            <div style={{ fontSize: 11, color: aiOnline ? "#00FFA3" : "#FF4D6A", fontWeight: 500 }}>{aiOnline ? "Ollama connecté" : "Ollama hors ligne"}</div>
             <div style={{ fontSize: 9.5, color: "#2D3D5A", fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>qwen2.5:7b</div>
           </div>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: aiOnline ? "#00FFA3" : "#FF4D6A", boxShadow: aiOnline ? "0 0 5px #00FFA3" : "none", flexShrink: 0 }} />

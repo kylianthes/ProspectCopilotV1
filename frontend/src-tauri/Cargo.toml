@@ -10,9 +10,15 @@ name = "prospect_copilot_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "=2.0.0", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
-tauri-plugin-opener = "2"
-
+tauri = { version = "=2.0.0", features = [] }
+tauri-plugin-opener = "=2.0.0"
+tauri-plugin-shell = "=2.0.0"
+tauri-codegen = "=2.0.0"
+tauri-macros = "=2.0.0"
+tauri-runtime = "=2.0.0"
+tauri-runtime-wry = "=2.0.0"
+tauri-utils = "=2.0.0"
+serde_json = "1"
