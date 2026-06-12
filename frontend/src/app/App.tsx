@@ -129,18 +129,23 @@ export default function App() {
   };
 
   const analyzeProspect = async (id: string) => {
-    updateProspect(id, { status: "analyzing" });
-    const response = await fetch(`${API_BASE_URL}/prospects/${id}/analyze`, { method: "POST" });
-    if (response.ok) {
+    setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "analyzing" } : p));
+    try {
+      const response = await fetch(`${API_BASE_URL}/prospects/${id}/analyze`, { method: "POST" });
+      if (!response.ok) throw new Error("Unable to analyze prospect");
       const analyzed: ApiProspect = await response.json();
       setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(analyzed) : p));
+    } catch (error) {
+      console.error(error);
+      setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "new" } : p));
     }
   };
 
   const generateMessage = async (id: string, tone: MessageTone, type: MessageType) => {
-    updateProspect(id, { status: "generating", messageTone: tone, messageType: type });
-    const response = await fetch(`${API_BASE_URL}/prospects/${id}/generate-message`, { method: "POST" });
-    if (response.ok) {
+    setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "generating", messageTone: tone, messageType: type } : p));
+    try {
+      const response = await fetch(`${API_BASE_URL}/prospects/${id}/generate-message`, { method: "POST" });
+      if (!response.ok) throw new Error("Unable to generate message");
       const generated: ApiProspect = await response.json();
       const mapped = fromApiProspect(generated);
       setProspects(prev => prev.map(p => p.id === id ? {
@@ -149,6 +154,9 @@ export default function App() {
         messageType: type,
         messageTone: tone,
       } : p));
+    } catch (error) {
+      console.error(error);
+      setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "analyzed" } : p));
     }
   };
 

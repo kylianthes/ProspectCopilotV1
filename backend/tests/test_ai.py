@@ -31,7 +31,7 @@ class PatchedAsyncClient:
 async def test_ollama_health_reports_model_availability(monkeypatch: pytest.MonkeyPatch) -> None:
     response = httpx.Response(
         status_code=200,
-        json={"models": [{"name": "qwen2.5:7b"}, {"name": "llama3.2:3b"}]},
+        json={"models": [{"name": "qwen2.5:1.5b"}, {"name": "llama3.2:3b"}]},
     )
     transport = MockTransport(response=response)
     real_async_client = httpx.AsyncClient
@@ -41,12 +41,12 @@ async def test_ollama_health_reports_model_availability(monkeypatch: pytest.Monk
 
     monkeypatch.setattr(httpx, "AsyncClient", async_client_factory)
 
-    client = OllamaClient(model="qwen2.5:7b")
+    client = OllamaClient(model="qwen2.5:1.5b")
     health = await client.health()
 
     assert health["online"] is True
     assert health["model_available"] is True
-    assert health["models"] == ["qwen2.5:7b", "llama3.2:3b"]
+    assert health["models"] == ["qwen2.5:1.5b", "llama3.2:3b"]
 
 
 @pytest.mark.anyio
@@ -59,7 +59,7 @@ async def test_ollama_health_handles_connection_error(monkeypatch: pytest.Monkey
 
     monkeypatch.setattr(httpx, "AsyncClient", async_client_factory)
 
-    client = OllamaClient(model="qwen2.5:7b")
+    client = OllamaClient(model="qwen2.5:1.5b")
     health = await client.health()
 
     assert health["online"] is False

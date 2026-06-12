@@ -17,7 +17,7 @@ const TABS: { id: Tab; label: string; icon: React.ComponentType<{ size?: number 
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
-const MODELS = ["qwen2.5:7b", "llama3:latest", "llama3.1:8b", "llama3.2:3b", "mistral:7b", "phi3:mini", "gemma2:9b"];
+const MODELS = ["qwen2.5:1.5b", "qwen2.5:7b", "llama3:latest", "llama3.1:8b", "llama3.2:3b", "mistral:7b", "phi3:mini", "gemma2:9b"];
 const TONES: { value: MessageTone; label: string; desc: string }[] = [
   { value: "professionnel", label: "Professionnel", desc: "Formel, B2B, respectueux" },
   { value: "amical",        label: "Amical",        desc: "Décontracté, accessible" },

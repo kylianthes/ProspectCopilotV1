@@ -66,7 +66,7 @@ Bio: {prospect.bio}
 Source: {prospect.source or "Unknown"}
 """
     try:
-        response = await ollama_client.generate(prompt)
+        response = await ollama_client.generate(prompt, num_predict=180, temperature=0.2)
         payload = _extract_json(response)
         return ProspectAnalysis(**payload)
     except (httpx.HTTPError, json.JSONDecodeError, ValueError):
@@ -96,7 +96,7 @@ Score: {prospect.score if prospect.score is not None else "Unknown"}
 Category: {prospect.category or "Unknown"}
 """
     try:
-        response = await ollama_client.generate(prompt)
+        response = await ollama_client.generate(prompt, num_predict=420, temperature=0.6)
         payload = _extract_json(response)
         return GeneratedMessages(**payload)
     except (httpx.HTTPError, json.JSONDecodeError, ValueError):

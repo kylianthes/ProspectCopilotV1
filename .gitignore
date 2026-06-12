@@ -11,3 +11,5 @@ work/
 outputs/
 frontend/src-tauri/target/
 frontend/src-tauri/gen/
+backend/build/
+backend/*.spec

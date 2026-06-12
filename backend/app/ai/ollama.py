@@ -43,12 +43,26 @@ class OllamaClient:
             "error": None,
         }
 
-    async def generate(self, prompt: str) -> str:
+    async def generate(
+        self,
+        prompt: str,
+        *,
+        num_predict: int = 320,
+        temperature: float = 0.4,
+        json_mode: bool = True,
+    ) -> str:
         payload = {
             "model": self.model,
             "prompt": prompt,
             "stream": False,
+            "keep_alive": "10m",
+            "options": {
+                "num_predict": num_predict,
+                "temperature": temperature,
+            },
         }
+        if json_mode:
+            payload["format"] = "json"
         async with httpx.AsyncClient(timeout=self.timeout_seconds) as client:
             response = await client.post(f"{self.base_url}/api/generate", json=payload)
             response.raise_for_status()
