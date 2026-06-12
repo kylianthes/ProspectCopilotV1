@@ -81,6 +81,7 @@ export const MOCK_PROSPECTS: Prospect[] = [
 ];
 
 export const DEFAULT_AI_SETTINGS: AISettings = {
+  userName: "",
   ollamaEndpoint: "http://localhost:11434",
   model: "qwen2.5:1.5b",
   defaultTone: "professionnel",

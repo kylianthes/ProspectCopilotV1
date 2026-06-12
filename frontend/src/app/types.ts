@@ -39,6 +39,7 @@ export interface Prospect {
 }
 
 export interface AISettings {
+  userName: string;
   ollamaEndpoint: string;
   model: string;
   defaultTone: MessageTone;

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Search, Brain, MessageSquare, Check, X, Copy, Edit3, ChevronDown, Loader, Star, Trash2, Archive, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Search, Brain, MessageSquare, Check, X, Copy, Edit3, Loader, Trash2, Archive, Upload, Users } from "lucide-react";
 import type { Prospect, ProspectStatus, MessageTone, MessageType } from "../types";
 
 interface Props {
@@ -85,6 +85,20 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
   });
 
   const selected = prospects.find(p => p.id === selectedId) ?? null;
+
+  useEffect(() => {
+    if (!selectedId && prospects.length > 0) {
+      setSelectedId(prospects[0].id);
+      setNotesText(prospects[0].notes ?? "");
+      return;
+    }
+
+    if (selectedId && !prospects.some(p => p.id === selectedId)) {
+      const next = prospects[0] ?? null;
+      setSelectedId(next?.id ?? null);
+      setNotesText(next?.notes ?? "");
+    }
+  }, [prospects, selectedId]);
 
   const handleSelectProspect = (p: Prospect) => {
     setSelectedId(p.id);

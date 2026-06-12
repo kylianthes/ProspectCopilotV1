@@ -121,6 +121,17 @@ export function SettingsPage({ settings, onSave }: Props) {
           {/* -- IA TAB -- */}
           {tab === "ia" && (
             <>
+              <Section title="Profil utilisateur">
+                <Row label="Nom utilisateur" description="Nom affiché dans les paramètres locaux" right={
+                  <input value={local.userName} onChange={e => patch({ userName: e.target.value })}
+                    placeholder="Votre nom"
+                    style={{ width: 220, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#E8EDF5", fontSize: 12.5, outline: "none" }}
+                    onFocus={e => { e.target.style.borderColor = "rgba(0,212,255,0.3)"; }}
+                    onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                  />
+                } divider={false} />
+              </Section>
+
               <Section title="Connexion Ollama">
                 <Row label="Endpoint Ollama" description="URL du serveur Ollama local" right={
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

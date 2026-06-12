@@ -9,6 +9,7 @@ import type { Page, Prospect, MessageTone, MessageType, AISettings } from "./typ
 import { DEFAULT_AI_SETTINGS } from "./data";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
+const SETTINGS_STORAGE_KEY = "prospect-copilot-settings";
 
 interface ApiProspect {
   id: number;
@@ -45,7 +46,15 @@ function fromApiProspect(p: ApiProspect): Prospect {
 export default function App() {
   const [page, setPage] = useState<Page>("dashboard");
   const [prospects, setProspects] = useState<Prospect[]>([]);
-  const [aiSettings, setAiSettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
+  const [aiSettings, setAiSettings] = useState<AISettings>(() => {
+    const stored = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!stored) return DEFAULT_AI_SETTINGS;
+    try {
+      return { ...DEFAULT_AI_SETTINGS, ...JSON.parse(stored) };
+    } catch {
+      return DEFAULT_AI_SETTINGS;
+    }
+  });
   const [showAddModal, setShowAddModal] = useState(false);
   const [aiOnline, setAiOnline] = useState(false);
 
@@ -58,11 +67,23 @@ export default function App() {
 
   useEffect(() => {
     loadProspects().catch(console.error);
-    fetch(`${API_BASE_URL}/ai/health`)
-      .then(response => response.json())
-      .then(data => setAiOnline(Boolean(data.online)))
-      .catch(() => setAiOnline(false));
+
+    const checkAiHealth = () => {
+      fetch(`${API_BASE_URL}/ai/health`)
+        .then(response => response.json())
+        .then(data => setAiOnline(Boolean(data.online && data.model_available)))
+        .catch(() => setAiOnline(false));
+    };
+
+    checkAiHealth();
+    const interval = window.setInterval(checkAiHealth, 10000);
+    return () => window.clearInterval(interval);
   }, []);
+
+  const saveSettings = (settings: AISettings) => {
+    setAiSettings(settings);
+    window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  };
 
   const updateProspect = async (id: string, patch: Partial<Prospect>) => {
     setProspects(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
@@ -213,7 +234,7 @@ export default function App() {
           {page === "settings" && (
             <SettingsPage
               settings={aiSettings}
-              onSave={setAiSettings}
+              onSave={saveSettings}
             />
           )}
         </div>
