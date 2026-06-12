@@ -9,6 +9,7 @@ interface Props {
   onDelete: (id: string) => void;
   onAnalyze: (id: string) => void;
   onGenerate: (id: string, tone: MessageTone, type: MessageType) => void;
+  onImportCsv: (file: File) => void;
 }
 
 const STATUS_META: Record<ProspectStatus, { label: string; color: string; bg: string }> = {
@@ -33,7 +34,6 @@ const TONES: { value: MessageTone; label: string }[] = [
 const MSG_TYPES: { value: MessageType; label: string }[] = [
   { value: "email",    label: "Email" },
   { value: "dm",       label: "DM" },
-  { value: "linkedin", label: "LinkedIn" },
 ];
 
 function scoreColor(s: number) {
@@ -62,7 +62,7 @@ function ScoreRing({ score }: { score: number }) {
 
 type PanelTab = "analyse" | "message" | "notes";
 
-export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze, onGenerate }: Props) {
+export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze, onGenerate, onImportCsv }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(prospects[0]?.id ?? null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<ProspectStatus | "all">("all");
@@ -138,7 +138,19 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
             <span style={{ fontSize: 13, color: "#E8EDF5", fontWeight: 600 }}>Prospects <span style={{ color: "#3D4E6B", fontWeight: 400 }}>({filtered.length})</span></span>
             <div style={{ display: "flex", gap: 6 }}>
               <button title="Import CSV" style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.04)", color: "#6B7A99", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 6, padding: "5px 9px", fontSize: 11, cursor: "pointer" }}>
-                <Upload size={11} /> CSV
+                <label style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+                  <Upload size={11} /> CSV
+                  <input
+                    type="file"
+                    accept=".csv,text/csv"
+                    style={{ display: "none" }}
+                    onChange={event => {
+                      const file = event.target.files?.[0];
+                      if (file) onImportCsv(file);
+                      event.currentTarget.value = "";
+                    }}
+                  />
+                </label>
               </button>
               <button onClick={onAdd} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(0,212,255,0.1)", color: "#00D4FF", border: "1px solid rgba(0,212,255,0.2)", borderRadius: 6, padding: "5px 9px", fontSize: 11, cursor: "pointer" }}>
                 <Plus size={11} /> Ajouter
@@ -486,13 +498,12 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                       { label: "Entreprise",value: selected.company },
                       { label: "Rôle",      value: selected.role },
                       { label: "Email",     value: selected.email },
-                      { label: "LinkedIn",  value: selected.linkedin },
                       { label: "Niche",     value: selected.niche },
                       { label: "Ajouté le", value: new Date(selected.addedAt).toLocaleDateString("fr-FR") },
                     ].filter(row => row.value).map((row, i, arr) => (
                       <div key={row.label} style={{ display: "flex", padding: "10px 14px", borderBottom: i < arr.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                         <span style={{ fontSize: 11.5, color: "#4A5568", width: 90, flexShrink: 0 }}>{row.label}</span>
-                        <span style={{ fontSize: 11.5, color: "#C8D4E8", fontFamily: row.label === "Email" || row.label === "LinkedIn" ? "'JetBrains Mono', monospace" : "'Inter', sans-serif" }}>{row.value}</span>
+                        <span style={{ fontSize: 11.5, color: "#C8D4E8", fontFamily: row.label === "Email" ? "'JetBrains Mono', monospace" : "'Inter', sans-serif" }}>{row.value}</span>
                       </div>
                     ))}
                   </div>

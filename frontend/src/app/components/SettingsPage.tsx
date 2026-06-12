@@ -25,7 +25,6 @@ const TONES: { value: MessageTone; label: string; desc: string }[] = [
 const MSG_TYPES: { value: MessageType; label: string }[] = [
   { value: "email",    label: "Email" },
   { value: "dm",       label: "DM (réseau social)" },
-  { value: "linkedin", label: "LinkedIn InMail" },
 ];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

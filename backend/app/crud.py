@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Prospect
+from app.models import Prospect, ProspectHistory
 from app.schemas import ProspectCreate, ProspectUpdate
 
 
@@ -10,6 +10,7 @@ def create_prospect(db: Session, prospect: ProspectCreate) -> Prospect:
     db.add(db_prospect)
     db.commit()
     db.refresh(db_prospect)
+    create_history(db, db_prospect.id, "created", "Prospect created")
     return db_prospect
 
 
@@ -38,5 +39,32 @@ def update_prospect(
 
 
 def delete_prospect(db: Session, db_prospect: Prospect) -> None:
+    create_history(db, db_prospect.id, "deleted", "Prospect deleted")
     db.delete(db_prospect)
     db.commit()
+
+
+def create_history(
+    db: Session,
+    prospect_id: int,
+    event_type: str,
+    detail: str | None = None,
+) -> ProspectHistory:
+    history = ProspectHistory(
+        prospect_id=prospect_id,
+        event_type=event_type,
+        detail=detail,
+    )
+    db.add(history)
+    db.commit()
+    db.refresh(history)
+    return history
+
+
+def list_history(db: Session, prospect_id: int) -> list[ProspectHistory]:
+    statement = (
+        select(ProspectHistory)
+        .where(ProspectHistory.prospect_id == prospect_id)
+        .order_by(ProspectHistory.id.desc())
+    )
+    return list(db.scalars(statement).all())

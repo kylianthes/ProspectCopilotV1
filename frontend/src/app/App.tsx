@@ -1,56 +1,155 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { DashboardPage } from "./components/DashboardPage";
 import { ProspectsPage } from "./components/ProspectsPage";
 import { MessagesPage } from "./components/MessagesPage";
 import { SettingsPage } from "./components/SettingsPage";
-import { DesignSystemPage } from "./components/DesignSystemPage";
 import { AddProspectModal } from "./components/AddProspectModal";
 import type { Page, Prospect, MessageTone, MessageType, AISettings } from "./types";
-import { MOCK_PROSPECTS, DEFAULT_AI_SETTINGS, AI_ANALYSIS_POOL, MESSAGE_TEMPLATES } from "./data";
+import { DEFAULT_AI_SETTINGS } from "./data";
 
-function generateId() {
-  return "p" + Math.random().toString(36).slice(2, 9);
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+interface ApiProspect {
+  id: number;
+  name: string;
+  company?: string | null;
+  bio: string;
+  source?: string | null;
+  score?: number | null;
+  summary?: string | null;
+  category?: string | null;
+  dm_message?: string | null;
+  email_message?: string | null;
+  status: Prospect["status"];
+  created_at: string;
+}
+
+function fromApiProspect(p: ApiProspect): Prospect {
+  return {
+    id: String(p.id),
+    name: p.name,
+    company: p.company ?? undefined,
+    niche: p.source || p.category || "Non classe",
+    notes: p.bio,
+    status: p.status,
+    addedAt: p.created_at,
+    aiScore: p.score !== null && p.score !== undefined ? p.score * 10 : undefined,
+    aiSummary: p.summary ?? undefined,
+    aiCategory: p.category ?? undefined,
+    generatedMessage: p.email_message || p.dm_message || undefined,
+    messageType: p.email_message ? "email" : p.dm_message ? "dm" : undefined,
+  };
 }
 
 export default function App() {
   const [page, setPage] = useState<Page>("dashboard");
-  const [prospects, setProspects] = useState<Prospect[]>(MOCK_PROSPECTS);
+  const [prospects, setProspects] = useState<Prospect[]>([]);
   const [aiSettings, setAiSettings] = useState<AISettings>(DEFAULT_AI_SETTINGS);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [aiOnline] = useState(true); // simulated
+  const [aiOnline, setAiOnline] = useState(false);
 
-  const updateProspect = (id: string, patch: Partial<Prospect>) =>
+  const loadProspects = async () => {
+    const response = await fetch(`${API_BASE_URL}/prospects`);
+    if (!response.ok) throw new Error("Unable to load prospects");
+    const data: ApiProspect[] = await response.json();
+    setProspects(data.map(fromApiProspect));
+  };
+
+  useEffect(() => {
+    loadProspects().catch(console.error);
+    fetch(`${API_BASE_URL}/ai/health`)
+      .then(response => response.json())
+      .then(data => setAiOnline(Boolean(data.online)))
+      .catch(() => setAiOnline(false));
+  }, []);
+
+  const updateProspect = async (id: string, patch: Partial<Prospect>) => {
     setProspects(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
 
-  const addProspect = (data: Omit<Prospect, "id" | "status" | "addedAt">) => {
-    const newP: Prospect = { ...data, id: generateId(), status: "new", addedAt: new Date().toISOString(), notes: data.notes ?? "" };
-    setProspects(prev => [newP, ...prev]);
+    const payload: Record<string, unknown> = {};
+    if (patch.name !== undefined) payload.name = patch.name;
+    if (patch.company !== undefined) payload.company = patch.company;
+    if (patch.notes !== undefined) payload.bio = patch.notes;
+    if (patch.niche !== undefined) payload.source = patch.niche;
+    if (patch.status !== undefined) payload.status = patch.status;
+    if (patch.aiScore !== undefined) payload.score = Math.round(patch.aiScore / 10);
+    if (patch.aiSummary !== undefined) payload.summary = patch.aiSummary;
+    if (patch.aiCategory !== undefined) payload.category = patch.aiCategory;
+    if (patch.generatedMessage !== undefined) {
+      if (patch.messageType === "dm") payload.dm_message = patch.generatedMessage;
+      else payload.email_message = patch.generatedMessage;
+    }
+
+    if (Object.keys(payload).length === 0) return;
+    const response = await fetch(`${API_BASE_URL}/prospects/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (response.ok) {
+      const updated: ApiProspect = await response.json();
+      setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(updated) : p));
+    }
+  };
+
+  const addProspect = async (data: Omit<Prospect, "id" | "status" | "addedAt">) => {
+    const response = await fetch(`${API_BASE_URL}/prospects`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: data.name,
+        company: data.company,
+        bio: data.notes?.trim() || data.niche,
+        source: data.niche,
+      }),
+    });
+    if (response.ok) {
+      const created: ApiProspect = await response.json();
+      setProspects(prev => [fromApiProspect(created), ...prev]);
+    }
     setShowAddModal(false);
   };
 
-  const deleteProspect = (id: string) =>
+  const deleteProspect = async (id: string) => {
+    await fetch(`${API_BASE_URL}/prospects/${id}`, { method: "DELETE" });
     setProspects(prev => prev.filter(p => p.id !== id));
-
-  const analyzeProspect = (id: string) => {
-    updateProspect(id, { status: "analyzing" });
-    const mock = AI_ANALYSIS_POOL[Math.floor(Math.random() * AI_ANALYSIS_POOL.length)];
-    setTimeout(() => {
-      updateProspect(id, { status: "analyzed", ...mock, aiAnalyzedAt: new Date().toISOString() });
-    }, 1800);
   };
 
-  const generateMessage = (id: string, tone: MessageTone, type: MessageType) => {
-    const p = prospects.find(pr => pr.id === id);
-    if (!p) return;
+  const importCsv = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${API_BASE_URL}/prospects/import-csv`, {
+      method: "POST",
+      body: formData,
+    });
+    if (response.ok) {
+      await loadProspects();
+    }
+  };
+
+  const analyzeProspect = async (id: string) => {
+    updateProspect(id, { status: "analyzing" });
+    const response = await fetch(`${API_BASE_URL}/prospects/${id}/analyze`, { method: "POST" });
+    if (response.ok) {
+      const analyzed: ApiProspect = await response.json();
+      setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(analyzed) : p));
+    }
+  };
+
+  const generateMessage = async (id: string, tone: MessageTone, type: MessageType) => {
     updateProspect(id, { status: "generating", messageTone: tone, messageType: type });
-    const template = MESSAGE_TEMPLATES[tone];
-    const message = template
-      .replace(/{name}/g, p.name.split(" ")[0])
-      .replace(/{niche}/g, p.niche);
-    setTimeout(() => {
-      updateProspect(id, { status: "draft", generatedMessage: message, messageGeneratedAt: new Date().toISOString() });
-    }, 1200);
+    const response = await fetch(`${API_BASE_URL}/prospects/${id}/generate-message`, { method: "POST" });
+    if (response.ok) {
+      const generated: ApiProspect = await response.json();
+      const mapped = fromApiProspect(generated);
+      setProspects(prev => prev.map(p => p.id === id ? {
+        ...mapped,
+        generatedMessage: type === "dm" ? generated.dm_message ?? undefined : generated.email_message ?? undefined,
+        messageType: type,
+        messageTone: tone,
+      } : p));
+    }
   };
 
   const draftCount = prospects.filter(p => p.status === "draft").length;
@@ -94,6 +193,7 @@ export default function App() {
               onDelete={deleteProspect}
               onAnalyze={analyzeProspect}
               onGenerate={generateMessage}
+              onImportCsv={importCsv}
             />
           )}
           {page === "messages" && (
@@ -108,7 +208,6 @@ export default function App() {
               onSave={setAiSettings}
             />
           )}
-          {page === "design-system" && <DesignSystemPage />}
         </div>
       </div>
 

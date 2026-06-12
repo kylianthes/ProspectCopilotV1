@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.database import Base, get_db
 from app.main import app
+from app.schemas import GeneratedMessages, ProspectAnalysis
 
 
 engine = create_engine(
@@ -101,3 +102,56 @@ def test_import_csv_requires_name_and_bio_columns() -> None:
 
     assert response.status_code == 400
     assert response.json()["detail"] == "Missing required columns: bio"
+
+
+def test_ai_analysis_and_message_generation_flow(monkeypatch) -> None:
+    async def fake_analysis(prospect):
+        return ProspectAnalysis(
+            summary=f"{prospect.name} is a strong fit for the MVP workflow.",
+            score=8,
+            category="Hot",
+        )
+
+    async def fake_messages(prospect):
+        first_name = prospect.name.split(" ")[0]
+        return GeneratedMessages(
+            dm_message=f"Salut {first_name}, message DM personnalise.",
+            email_message=f"Bonjour {first_name}, message email personnalise.",
+        )
+
+    monkeypatch.setattr("app.api.prospects.run_ai_analysis", fake_analysis)
+    monkeypatch.setattr("app.api.prospects.run_message_generation", fake_messages)
+
+    create_response = client.post(
+        "/prospects",
+        json={
+            "name": "Claire Dubois",
+            "company": "ScaleLab",
+            "bio": "Founder working on sales operations and outbound workflows for B2B teams.",
+            "source": "manual",
+        },
+    )
+    assert create_response.status_code == 201
+    prospect_id = create_response.json()["id"]
+
+    analyze_response = client.post(f"/prospects/{prospect_id}/analyze")
+    assert analyze_response.status_code == 200
+    analyzed = analyze_response.json()
+    assert analyzed["status"] == "analyzed"
+    assert analyzed["summary"]
+    assert analyzed["score"] in range(0, 11)
+    assert analyzed["category"] in {"Hot", "Warm", "Cold"}
+
+    message_response = client.post(f"/prospects/{prospect_id}/generate-message")
+    assert message_response.status_code == 200
+    with_messages = message_response.json()
+    assert with_messages["status"] == "draft"
+    assert "Claire" in with_messages["dm_message"]
+    assert "Claire" in with_messages["email_message"]
+
+    history_response = client.get(f"/prospects/{prospect_id}/history")
+    assert history_response.status_code == 200
+    events = [entry["event_type"] for entry in history_response.json()]
+    assert "created" in events
+    assert "analyzed" in events
+    assert "message_generated" in events

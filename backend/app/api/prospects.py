@@ -6,8 +6,10 @@ from fastapi import File, UploadFile
 from sqlalchemy.orm import Session
 
 from app import crud
+from app.ai.prospect_ai import analyze_prospect as run_ai_analysis
+from app.ai.prospect_ai import generate_messages as run_message_generation
 from app.database import get_db
-from app.schemas import ProspectCreate, ProspectRead, ProspectUpdate
+from app.schemas import ProspectCreate, ProspectHistoryRead, ProspectRead, ProspectUpdate
 
 router = APIRouter(prefix="/prospects", tags=["prospects"])
 
@@ -69,7 +71,9 @@ async def import_prospects_csv(
             company=normalized.get("company") or None,
             source=normalized.get("source") or None,
         )
-        imported.append(crud.create_prospect(db, prospect))
+        imported_prospect = crud.create_prospect(db, prospect)
+        crud.create_history(db, imported_prospect.id, "imported", "Prospect imported from CSV")
+        imported.append(imported_prospect)
 
     return imported
 
@@ -85,6 +89,64 @@ def get_prospect(
     return db_prospect
 
 
+@router.get("/{prospect_id}/history", response_model=list[ProspectHistoryRead])
+def get_prospect_history(
+    prospect_id: int,
+    db: Session = Depends(get_db),
+) -> list[ProspectHistoryRead]:
+    db_prospect = crud.get_prospect(db, prospect_id)
+    if db_prospect is None:
+        raise HTTPException(status_code=404, detail="Prospect not found")
+    return crud.list_history(db, prospect_id)
+
+
+@router.post("/{prospect_id}/analyze", response_model=ProspectRead)
+async def analyze_prospect(
+    prospect_id: int,
+    db: Session = Depends(get_db),
+) -> ProspectRead:
+    db_prospect = crud.get_prospect(db, prospect_id)
+    if db_prospect is None:
+        raise HTTPException(status_code=404, detail="Prospect not found")
+
+    analysis = await run_ai_analysis(db_prospect)
+    updated = crud.update_prospect(
+        db,
+        db_prospect,
+        ProspectUpdate(
+            summary=analysis.summary,
+            score=analysis.score,
+            category=analysis.category,
+            status="analyzed",
+        ),
+    )
+    crud.create_history(db, prospect_id, "analyzed", f"Score {analysis.score}/10, category {analysis.category}")
+    return updated
+
+
+@router.post("/{prospect_id}/generate-message", response_model=ProspectRead)
+async def generate_prospect_message(
+    prospect_id: int,
+    db: Session = Depends(get_db),
+) -> ProspectRead:
+    db_prospect = crud.get_prospect(db, prospect_id)
+    if db_prospect is None:
+        raise HTTPException(status_code=404, detail="Prospect not found")
+
+    messages = await run_message_generation(db_prospect)
+    updated = crud.update_prospect(
+        db,
+        db_prospect,
+        ProspectUpdate(
+            dm_message=messages.dm_message,
+            email_message=messages.email_message,
+            status="draft",
+        ),
+    )
+    crud.create_history(db, prospect_id, "message_generated", "DM and email messages generated")
+    return updated
+
+
 @router.patch("/{prospect_id}", response_model=ProspectRead)
 def update_prospect(
     prospect_id: int,
@@ -94,7 +156,9 @@ def update_prospect(
     db_prospect = crud.get_prospect(db, prospect_id)
     if db_prospect is None:
         raise HTTPException(status_code=404, detail="Prospect not found")
-    return crud.update_prospect(db, db_prospect, prospect_update)
+    updated = crud.update_prospect(db, db_prospect, prospect_update)
+    crud.create_history(db, prospect_id, "updated", "Prospect updated")
+    return updated
 
 
 @router.delete("/{prospect_id}", status_code=status.HTTP_204_NO_CONTENT)

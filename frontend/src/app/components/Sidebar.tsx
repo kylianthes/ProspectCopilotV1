@@ -1,4 +1,4 @@
-import { Home, Users, MessageSquare, Settings, Layers, Cpu } from "lucide-react";
+import { Home, Users, MessageSquare, Settings, Cpu } from "lucide-react";
 import type { Page } from "../types";
 import { Logo } from "./Logo";
 
@@ -7,7 +7,6 @@ const NAV = [
   { id: "prospects"     as Page, label: "Prospects",     icon: Users },
   { id: "messages"      as Page, label: "Messages",      icon: MessageSquare },
   { id: "settings"      as Page, label: "Paramètres",    icon: Settings },
-  { id: "design-system" as Page, label: "Design System", icon: Layers },
 ];
 
 interface Props {
@@ -84,7 +83,7 @@ export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, ai
           <Cpu size={12} style={{ color: aiOnline ? "#00FFA3" : "#FF4D6A", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 11, color: aiOnline ? "#00FFA3" : "#FF4D6A", fontWeight: 500 }}>{aiOnline ? "Ollama connecté" : "Ollama hors ligne"}</div>
-            <div style={{ fontSize: 9.5, color: "#2D3D5A", fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>llama3.1:8b</div>
+            <div style={{ fontSize: 9.5, color: "#2D3D5A", fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>qwen2.5:7b</div>
           </div>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: aiOnline ? "#00FFA3" : "#FF4D6A", boxShadow: aiOnline ? "0 0 5px #00FFA3" : "none", flexShrink: 0 }} />
         </div>

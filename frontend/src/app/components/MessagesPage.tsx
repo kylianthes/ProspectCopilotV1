@@ -22,7 +22,7 @@ const STATUS_META: Record<ProspectStatus, { label: string; color: string; bg: st
 };
 
 const TONE_LABELS: Record<MessageTone, string> = { professionnel: "Professionnel", amical: "Amical", direct: "Direct", chaleureux: "Chaleureux" };
-const TYPE_LABELS: Record<MessageType, string> = { email: "Email", dm: "DM", linkedin: "LinkedIn" };
+const TYPE_LABELS: Record<MessageType, string> = { email: "Email", dm: "DM" };
 
 const TABS: { id: FilterTab; label: string; statuses: ProspectStatus[] }[] = [
   { id: "all",       label: "Tous",     statuses: ["draft","validated","sent","rejected"] },

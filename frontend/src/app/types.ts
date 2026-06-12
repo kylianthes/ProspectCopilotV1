@@ -1,4 +1,4 @@
-export type Page = "dashboard" | "prospects" | "messages" | "settings" | "design-system";
+export type Page = "dashboard" | "prospects" | "messages" | "settings";
 
 export type ProspectStatus =
   | "new"          // just added
@@ -11,7 +11,7 @@ export type ProspectStatus =
   | "rejected"     // human rejected
   | "archived";
 
-export type MessageType = "email" | "dm" | "linkedin";
+export type MessageType = "email" | "dm";
 export type MessageTone = "professionnel" | "amical" | "direct" | "chaleureux";
 
 export interface Prospect {
@@ -20,7 +20,6 @@ export interface Prospect {
   company?: string;
   role?: string;
   email?: string;
-  linkedin?: string;
   niche: string;
   notes: string;
   status: ProspectStatus;
@@ -48,5 +47,5 @@ export interface AISettings {
   temperature: number;
 }
 
-// Kept for Design System showcase (NetworkBadge component)
+// Kept for unused Figma Make showcase components.
 export type NetworkId = "instagram" | "tiktok" | "linkedin" | "twitter" | "youtube";

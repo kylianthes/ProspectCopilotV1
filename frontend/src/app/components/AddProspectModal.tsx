@@ -8,20 +8,49 @@ interface Props {
 }
 
 export function AddProspectModal({ onClose, onAdd }: Props) {
-  const [form, setForm] = useState({ name: "", company: "", role: "", email: "", linkedin: "", niche: "", notes: "" });
+  const [form, setForm] = useState({ name: "", company: "", role: "", email: "", source: "", bio: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const patch = (k: keyof typeof form, v: string) => { setForm(p => ({ ...p, [k]: v })); setErrors(e => { const c = {...e}; delete c[k]; return c; }); };
-
-  const handleSubmit = () => {
-    const errs: Record<string, string> = {};
-    if (!form.name.trim()) errs.name = "Le nom est requis";
-    if (!form.niche.trim()) errs.niche = "La niche est requise";
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-    onAdd({ name: form.name.trim(), company: form.company || undefined, role: form.role || undefined, email: form.email || undefined, linkedin: form.linkedin || undefined, niche: form.niche.trim(), notes: form.notes });
+  const patch = (key: keyof typeof form, value: string) => {
+    setForm(previous => ({ ...previous, [key]: value }));
+    setErrors(previous => {
+      const next = { ...previous };
+      delete next[key];
+      return next;
+    });
   };
 
-  const inputStyle = (err?: string): React.CSSProperties => ({ width: "100%", background: "#0C1420", border: `1px solid ${err ? "rgba(255,77,106,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 8, padding: "9px 12px", color: "#E8EDF5", fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" });
+  const handleSubmit = () => {
+    const nextErrors: Record<string, string> = {};
+    if (!form.name.trim()) nextErrors.name = "Le nom est requis";
+    if (!form.bio.trim()) nextErrors.bio = "La bio est requise";
+    if (Object.keys(nextErrors).length) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    onAdd({
+      name: form.name.trim(),
+      company: form.company.trim() || undefined,
+      role: form.role.trim() || undefined,
+      email: form.email.trim() || undefined,
+      niche: form.source.trim() || "manual",
+      notes: form.bio.trim(),
+    });
+  };
+
+  const inputStyle = (error?: string): React.CSSProperties => ({
+    width: "100%",
+    background: "#0C1420",
+    border: `1px solid ${error ? "rgba(255,77,106,0.4)" : "rgba(255,255,255,0.08)"}`,
+    borderRadius: 8,
+    padding: "9px 12px",
+    color: "#E8EDF5",
+    fontSize: 13,
+    outline: "none",
+    boxSizing: "border-box",
+    fontFamily: "'Inter', sans-serif",
+  });
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 300 }}>
@@ -29,7 +58,7 @@ export function AddProspectModal({ onClose, onAdd }: Props) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px" }}>
           <div>
             <div style={{ fontSize: 16, color: "#E8EDF5", fontWeight: 600 }}>Ajouter un prospect</div>
-            <div style={{ fontSize: 12, color: "#4A5568", marginTop: 3 }}>Saisie manuelle — les champs marqués * sont obligatoires</div>
+            <div style={{ fontSize: 12, color: "#4A5568", marginTop: 3 }}>Saisie manuelle - nom et bio obligatoires</div>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "#4A5568", padding: 4 }}><X size={18} /></button>
         </div>
@@ -38,36 +67,31 @@ export function AddProspectModal({ onClose, onAdd }: Props) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
             <div>
               <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Nom complet *</label>
-              <input value={form.name} onChange={e => patch("name", e.target.value)} placeholder="Léa Fontaine" style={inputStyle(errors.name)} onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { if(!errors.name) e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
+              <input value={form.name} onChange={event => patch("name", event.target.value)} placeholder="Lea Fontaine" style={inputStyle(errors.name)} />
               {errors.name && <div style={{ fontSize: 11, color: "#FF4D6A", marginTop: 3 }}>{errors.name}</div>}
             </div>
             <div>
-              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Niche / Secteur *</label>
-              <input value={form.niche} onChange={e => patch("niche", e.target.value)} placeholder="Finance personnelle" style={inputStyle(errors.niche)} onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { if(!errors.niche) e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
-              {errors.niche && <div style={{ fontSize: 11, color: "#FF4D6A", marginTop: 3 }}>{errors.niche}</div>}
+              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Source</label>
+              <input value={form.source} onChange={event => patch("source", event.target.value)} placeholder="manual, csv, salon..." style={inputStyle()} />
             </div>
             <div>
               <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Entreprise</label>
-              <input value={form.company} onChange={e => patch("company", e.target.value)} placeholder="Investissements LF" style={inputStyle()} onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
+              <input value={form.company} onChange={event => patch("company", event.target.value)} placeholder="Northstar" style={inputStyle()} />
             </div>
             <div>
-              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Rôle</label>
-              <input value={form.role} onChange={e => patch("role", e.target.value)} placeholder="Fondatrice" style={inputStyle()} onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
+              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Role</label>
+              <input value={form.role} onChange={event => patch("role", event.target.value)} placeholder="Fondatrice" style={inputStyle()} />
             </div>
             <div>
               <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Email</label>
-              <input value={form.email} onChange={e => patch("email", e.target.value)} placeholder="contact@example.com" style={inputStyle()} onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>LinkedIn</label>
-              <input value={form.linkedin} onChange={e => patch("linkedin", e.target.value)} placeholder="linkedin.com/in/…" style={inputStyle()} onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
+              <input value={form.email} onChange={event => patch("email", event.target.value)} placeholder="contact@example.com" style={inputStyle()} />
             </div>
           </div>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Notes</label>
-            <textarea value={form.notes} onChange={e => patch("notes", e.target.value)} placeholder="Contexte, observations, source…" rows={3}
-              style={{ ...inputStyle(), resize: "vertical", lineHeight: 1.6 }}
-              onFocus={e => { e.target.style.borderColor="rgba(0,212,255,0.3)"; }} onBlur={e => { e.target.style.borderColor="rgba(255,255,255,0.08)"; }} />
+            <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Bio *</label>
+            <textarea value={form.bio} onChange={event => patch("bio", event.target.value)} placeholder="Activite, contexte, signaux utiles..." rows={4}
+              style={{ ...inputStyle(errors.bio), resize: "vertical", lineHeight: 1.6 }} />
+            {errors.bio && <div style={{ fontSize: 11, color: "#FF4D6A", marginTop: 3 }}>{errors.bio}</div>}
           </div>
         </div>
 

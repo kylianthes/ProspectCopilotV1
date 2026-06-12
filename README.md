@@ -6,7 +6,9 @@ Current state:
 
 - Backend foundation is implemented with FastAPI, SQLite, SQLAlchemy, and prospect CRUD.
 - Frontend design from the Figma Make/GitHub project is installed in `frontend/`.
-- The frontend still uses mock data. That is intentional until the API connection phase.
+- The frontend is connected to the FastAPI backend for prospect CRUD, CSV import, AI analysis, and message generation.
+- Ollama/Qwen integration is available through the backend. If Ollama is slow or unavailable, the backend uses a basic local fallback instead of crashing.
+- Tauri desktop scaffolding exists in `frontend/src-tauri`, but Rust/Cargo must be installed before building a Windows desktop app.
 
 ## Structure
 
@@ -44,6 +46,18 @@ Vite usually opens at:
 ```text
 http://localhost:5173
 ```
+
+## Desktop
+
+Rust/Cargo is required for Tauri.
+
+```powershell
+cd frontend
+npm run tauri:dev
+npm run tauri:build
+```
+
+If `cargo` is not recognized, install Rust first. Without Rust, the web app still works, but the Windows desktop package cannot be built.
 
 ## VSCode
 
