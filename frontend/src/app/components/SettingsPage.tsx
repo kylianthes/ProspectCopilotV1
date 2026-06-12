@@ -15,7 +15,9 @@ const TABS: { id: Tab; label: string; icon: React.ComponentType<{ size?: number 
   { id: "donnees",    label: "Données",    icon: Database },
 ];
 
-const MODELS = ["llama3.1:8b", "llama3.1:70b", "llama3.2:3b", "mistral:7b", "mixtral:8x7b", "phi3:mini", "gemma2:9b"];
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+const MODELS = ["qwen2.5:7b", "llama3:latest", "llama3.1:8b", "llama3.2:3b", "mistral:7b", "phi3:mini", "gemma2:9b"];
 const TONES: { value: MessageTone; label: string; desc: string }[] = [
   { value: "professionnel", label: "Professionnel", desc: "Formel, B2B, respectueux" },
   { value: "amical",        label: "Amical",        desc: "Décontracté, accessible" },
@@ -70,9 +72,15 @@ export function SettingsPage({ settings, onSave }: Props) {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const testConnection = () => {
+  const testConnection = async () => {
     setTestStatus("testing");
-    setTimeout(() => setTestStatus(Math.random() > 0.4 ? "ok" : "fail"), 1400);
+    try {
+      const response = await fetch(`${API_BASE_URL}/ai/health`);
+      const data = await response.json();
+      setTestStatus(response.ok && data.online ? "ok" : "fail");
+    } catch {
+      setTestStatus("fail");
+    }
   };
 
   return (

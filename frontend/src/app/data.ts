@@ -82,7 +82,7 @@ export const MOCK_PROSPECTS: Prospect[] = [
 
 export const DEFAULT_AI_SETTINGS: AISettings = {
   ollamaEndpoint: "http://localhost:11434",
-  model: "llama3.1:8b",
+  model: "qwen2.5:7b",
   defaultTone: "professionnel",
   defaultMessageType: "email",
   maxTokens: 512,
