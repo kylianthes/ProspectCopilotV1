@@ -50,7 +50,7 @@ def _fallback_messages(prospect: Prospect) -> GeneratedMessages:
     )
 
 
-async def analyze_prospect(prospect: Prospect) -> ProspectAnalysis:
+async def analyze_prospect(prospect: Prospect, model: str | None = None) -> ProspectAnalysis:
     prompt = f"""
 Analyze this sales prospect for a manual prospecting workflow.
 
@@ -66,14 +66,14 @@ Bio: {prospect.bio}
 Source: {prospect.source or "Unknown"}
 """
     try:
-        response = await ollama_client.generate(prompt, num_predict=180, temperature=0.2)
+        response = await ollama_client.generate(prompt, model=model, num_predict=180, temperature=0.2)
         payload = _extract_json(response)
         return ProspectAnalysis(**payload)
     except (httpx.HTTPError, json.JSONDecodeError, ValueError):
         return _fallback_analysis(prospect)
 
 
-async def generate_messages(prospect: Prospect) -> GeneratedMessages:
+async def generate_messages(prospect: Prospect, model: str | None = None) -> GeneratedMessages:
     prompt = f"""
 Write two personalized outreach messages for this prospect.
 
@@ -96,7 +96,7 @@ Score: {prospect.score if prospect.score is not None else "Unknown"}
 Category: {prospect.category or "Unknown"}
 """
     try:
-        response = await ollama_client.generate(prompt, num_predict=420, temperature=0.6)
+        response = await ollama_client.generate(prompt, model=model, num_predict=420, temperature=0.6)
         payload = _extract_json(response)
         return GeneratedMessages(**payload)
     except (httpx.HTTPError, json.JSONDecodeError, ValueError):

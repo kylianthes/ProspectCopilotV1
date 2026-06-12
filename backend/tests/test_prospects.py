@@ -105,14 +105,14 @@ def test_import_csv_requires_name_and_bio_columns() -> None:
 
 
 def test_ai_analysis_and_message_generation_flow(monkeypatch) -> None:
-    async def fake_analysis(prospect):
+    async def fake_analysis(prospect, model=None):
         return ProspectAnalysis(
             summary=f"{prospect.name} is a strong fit for the MVP workflow.",
             score=8,
             category="Hot",
         )
 
-    async def fake_messages(prospect):
+    async def fake_messages(prospect, model=None):
         first_name = prospect.name.split(" ")[0]
         return GeneratedMessages(
             dm_message=f"Salut {first_name}, message DM personnalise.",

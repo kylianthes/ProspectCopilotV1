@@ -12,4 +12,5 @@ outputs/
 frontend/src-tauri/target/
 frontend/src-tauri/gen/
 backend/build/
+backend/dist-debug/
 backend/*.spec

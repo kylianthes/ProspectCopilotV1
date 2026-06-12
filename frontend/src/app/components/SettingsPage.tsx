@@ -26,7 +26,7 @@ const TONES: { value: MessageTone; label: string; desc: string }[] = [
 ];
 const MSG_TYPES: { value: MessageType; label: string }[] = [
   { value: "email",    label: "Email" },
-  { value: "dm",       label: "DM (réseau social)" },
+  { value: "dm",       label: "DM" },
 ];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -75,9 +75,10 @@ export function SettingsPage({ settings, onSave }: Props) {
   const testConnection = async () => {
     setTestStatus("testing");
     try {
-      const response = await fetch(`${API_BASE_URL}/ai/health`);
+      const params = new URLSearchParams({ model: local.model });
+      const response = await fetch(`${API_BASE_URL}/ai/health?${params.toString()}`);
       const data = await response.json();
-      setTestStatus(response.ok && data.online ? "ok" : "fail");
+      setTestStatus(response.ok && data.online && data.model_available ? "ok" : "fail");
     } catch {
       setTestStatus("fail");
     }
@@ -228,17 +229,8 @@ export function SettingsPage({ settings, onSave }: Props) {
                 <Row label="Emplacement des données" description="Les données restent sur votre machine (aucun cloud)" right={
                   <span style={{ fontSize: 12, color: "#00FFA3", background: "rgba(0,255,163,0.08)", borderRadius: 6, padding: "3px 10px" }}>Local uniquement</span>
                 } />
-                <Row label="Prospects enregistrés" right={
-                  <button style={{ fontSize: 12.5, color: "#00D4FF", background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.18)", borderRadius: 7, padding: "5px 12px", cursor: "pointer" }}>Exporter JSON</button>
-                } />
-                <Row label="Import CSV" description="Importer une liste de prospects depuis un fichier CSV" right={
-                  <button style={{ fontSize: 12.5, color: "#00D4FF", background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.18)", borderRadius: 7, padding: "5px 12px", cursor: "pointer" }}>Importer CSV</button>
-                } divider={false} />
-              </Section>
-
-              <Section title="Danger">
-                <Row label="Réinitialiser toutes les données" description="Supprime définitivement tous les prospects, messages et paramètres" right={
-                  <button style={{ background: "rgba(255,77,106,0.1)", color: "#FF4D6A", border: "1px solid rgba(255,77,106,0.2)", borderRadius: 7, padding: "6px 14px", fontSize: 12.5, cursor: "pointer" }}>Réinitialiser</button>
+                <Row label="Import CSV" description="Disponible depuis la page Prospects" right={
+                  <span style={{ fontSize: 12, color: "#6B7A99", background: "rgba(255,255,255,0.04)", borderRadius: 6, padding: "3px 10px" }}>Prospects</span>
                 } divider={false} />
               </Section>
             </>

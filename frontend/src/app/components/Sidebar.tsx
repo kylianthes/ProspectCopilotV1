@@ -16,9 +16,18 @@ interface Props {
   newCount: number;
   totalCount: number;
   aiOnline: boolean;
+  userName: string;
+  aiModel: string;
 }
 
-export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, aiOnline }: Props) {
+export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, aiOnline, userName, aiModel }: Props) {
+  const displayName = userName.trim() || "Utilisateur";
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join("") || "U";
   return (
     <div style={{ width: 220, minWidth: 220, background: "#090D18", borderRight: "1px solid #131E30", display: "flex", flexDirection: "column", height: "100%" }}>
 
@@ -83,7 +92,7 @@ export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, ai
           <Cpu size={12} style={{ color: aiOnline ? "#00FFA3" : "#FF4D6A", flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 11, color: aiOnline ? "#00FFA3" : "#FF4D6A", fontWeight: 500 }}>{aiOnline ? "Ollama connecté" : "Ollama hors ligne"}</div>
-            <div style={{ fontSize: 9.5, color: "#2D3D5A", fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>qwen2.5:1.5b</div>
+            <div style={{ fontSize: 9.5, color: "#2D3D5A", fontFamily: "'JetBrains Mono', monospace", marginTop: 1 }}>{aiModel}</div>
           </div>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: aiOnline ? "#00FFA3" : "#FF4D6A", boxShadow: aiOnline ? "0 0 5px #00FFA3" : "none", flexShrink: 0 }} />
         </div>
@@ -92,9 +101,9 @@ export function Sidebar({ page, onNavigate, draftCount, newCount, totalCount, ai
       {/* User footer */}
       <div style={{ padding: "10px 12px", borderTop: "1px solid #131E30" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#1C2A45", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 700, color: "#6B7A99", border: "1px solid #1E2D45", flexShrink: 0 }}>AL</div>
+          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#1C2A45", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10.5, fontWeight: 700, color: "#6B7A99", border: "1px solid #1E2D45", flexShrink: 0 }}>{initials}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, color: "#C8D4E8", fontWeight: 500 }}>Alexandre L.</div>
+            <div style={{ fontSize: 12, color: "#C8D4E8", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{displayName}</div>
             <div style={{ fontSize: 10, color: "#2D3D5A" }}>Prospect Copilot</div>
           </div>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00FFA3", boxShadow: "0 0 5px #00FFA3" }} />

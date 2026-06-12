@@ -51,6 +51,10 @@ class GeneratedMessages(BaseModel):
     email_message: str
 
 
+class AIRequest(BaseModel):
+    model: str | None = Field(default=None, max_length=100)
+
+
 class ProspectHistoryRead(BaseModel):
     id: int
     prospect_id: int

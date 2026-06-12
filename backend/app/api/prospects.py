@@ -9,7 +9,7 @@ from app import crud
 from app.ai.prospect_ai import analyze_prospect as run_ai_analysis
 from app.ai.prospect_ai import generate_messages as run_message_generation
 from app.database import get_db
-from app.schemas import ProspectCreate, ProspectHistoryRead, ProspectRead, ProspectUpdate
+from app.schemas import AIRequest, ProspectCreate, ProspectHistoryRead, ProspectRead, ProspectUpdate
 
 router = APIRouter(prefix="/prospects", tags=["prospects"])
 
@@ -103,13 +103,14 @@ def get_prospect_history(
 @router.post("/{prospect_id}/analyze", response_model=ProspectRead)
 async def analyze_prospect(
     prospect_id: int,
+    request: AIRequest | None = None,
     db: Session = Depends(get_db),
 ) -> ProspectRead:
     db_prospect = crud.get_prospect(db, prospect_id)
     if db_prospect is None:
         raise HTTPException(status_code=404, detail="Prospect not found")
 
-    analysis = await run_ai_analysis(db_prospect)
+    analysis = await run_ai_analysis(db_prospect, model=request.model if request else None)
     updated = crud.update_prospect(
         db,
         db_prospect,
@@ -127,13 +128,14 @@ async def analyze_prospect(
 @router.post("/{prospect_id}/generate-message", response_model=ProspectRead)
 async def generate_prospect_message(
     prospect_id: int,
+    request: AIRequest | None = None,
     db: Session = Depends(get_db),
 ) -> ProspectRead:
     db_prospect = crud.get_prospect(db, prospect_id)
     if db_prospect is None:
         raise HTTPException(status_code=404, detail="Prospect not found")
 
-    messages = await run_message_generation(db_prospect)
+    messages = await run_message_generation(db_prospect, model=request.model if request else None)
     updated = crud.update_prospect(
         db,
         db_prospect,

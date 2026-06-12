@@ -10,4 +10,6 @@ if __name__ == "__main__":
         port=8000,
         reload=False,
         log_level="warning",
+        log_config=None,
+        access_log=False,
     )

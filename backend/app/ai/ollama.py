@@ -23,13 +23,14 @@ class OllamaClient:
             payload = response.json()
         return [model["name"] for model in payload.get("models", [])]
 
-    async def health(self) -> dict[str, Any]:
+    async def health(self, model: str | None = None) -> dict[str, Any]:
+        selected_model = model or self.model
         try:
             models = await self.list_models()
         except httpx.HTTPError as exc:
             return {
                 "online": False,
-                "model": self.model,
+                "model": selected_model,
                 "model_available": False,
                 "models": [],
                 "error": str(exc),
@@ -37,8 +38,8 @@ class OllamaClient:
 
         return {
             "online": True,
-            "model": self.model,
-            "model_available": self.model in models,
+            "model": selected_model,
+            "model_available": selected_model in models,
             "models": models,
             "error": None,
         }
@@ -47,12 +48,13 @@ class OllamaClient:
         self,
         prompt: str,
         *,
+        model: str | None = None,
         num_predict: int = 320,
         temperature: float = 0.4,
         json_mode: bool = True,
     ) -> str:
         payload = {
-            "model": self.model,
+            "model": model or self.model,
             "prompt": prompt,
             "stream": False,
             "keep_alive": "10m",

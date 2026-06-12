@@ -69,7 +69,8 @@ export default function App() {
     loadProspects().catch(console.error);
 
     const checkAiHealth = () => {
-      fetch(`${API_BASE_URL}/ai/health`)
+      const params = new URLSearchParams({ model: aiSettings.model });
+      fetch(`${API_BASE_URL}/ai/health?${params.toString()}`)
         .then(response => response.json())
         .then(data => setAiOnline(Boolean(data.online && data.model_available)))
         .catch(() => setAiOnline(false));
@@ -78,7 +79,7 @@ export default function App() {
     checkAiHealth();
     const interval = window.setInterval(checkAiHealth, 10000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [aiSettings.model]);
 
   const saveSettings = (settings: AISettings) => {
     setAiSettings(settings);
@@ -152,7 +153,11 @@ export default function App() {
   const analyzeProspect = async (id: string) => {
     setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "analyzing" } : p));
     try {
-      const response = await fetch(`${API_BASE_URL}/prospects/${id}/analyze`, { method: "POST" });
+      const response = await fetch(`${API_BASE_URL}/prospects/${id}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: aiSettings.model }),
+      });
       if (!response.ok) throw new Error("Unable to analyze prospect");
       const analyzed: ApiProspect = await response.json();
       setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(analyzed) : p));
@@ -165,7 +170,11 @@ export default function App() {
   const generateMessage = async (id: string, tone: MessageTone, type: MessageType) => {
     setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "generating", messageTone: tone, messageType: type } : p));
     try {
-      const response = await fetch(`${API_BASE_URL}/prospects/${id}/generate-message`, { method: "POST" });
+      const response = await fetch(`${API_BASE_URL}/prospects/${id}/generate-message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: aiSettings.model }),
+      });
       if (!response.ok) throw new Error("Unable to generate message");
       const generated: ApiProspect = await response.json();
       const mapped = fromApiProspect(generated);
@@ -193,6 +202,8 @@ export default function App() {
         newCount={newCount}
         totalCount={prospects.length}
         aiOnline={aiOnline}
+        userName={aiSettings.userName}
+        aiModel={aiSettings.model}
       />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
