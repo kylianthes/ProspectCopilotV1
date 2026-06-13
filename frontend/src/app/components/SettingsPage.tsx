@@ -50,13 +50,6 @@ function Row({ label, description, right, divider = true }: { label: string; des
   );
 }
 
-function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button onClick={() => onChange(!value)} style={{ width: 42, height: 22, borderRadius: 11, border: "none", cursor: "pointer", padding: 0, position: "relative", background: value ? "#00D4FF" : "#1E2D45", transition: "background 0.2s" }}>
-      <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 3, left: value ? 23 : 3, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.4)" }} />
-    </button>
-  );
-}
 
 export function SettingsPage({ settings, onSave }: Props) {
   const [tab, setTab] = useState<Tab>("ia");
@@ -134,13 +127,9 @@ export function SettingsPage({ settings, onSave }: Props) {
               </Section>
 
               <Section title="Connexion Ollama">
-                <Row label="Endpoint Ollama" description="URL du serveur Ollama local" right={
+                <Row label="Endpoint Ollama" description="Serveur local utilise par Prospect Copilot" right={
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <input value={local.ollamaEndpoint} onChange={e => patch({ ollamaEndpoint: e.target.value })}
-                      style={{ width: 220, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#E8EDF5", fontSize: 12.5, outline: "none", fontFamily: "'JetBrains Mono', monospace" }}
-                      onFocus={e => { e.target.style.borderColor = "rgba(0,212,255,0.3)"; }}
-                      onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }}
-                    />
+                    <span style={{ width: 220, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#6B7A99", fontSize: 12.5, fontFamily: "'JetBrains Mono', monospace" }}>http://127.0.0.1:11434</span>
                     <button onClick={testConnection} style={{ display: "flex", alignItems: "center", gap: 5, background: testStatus === "ok" ? "rgba(0,255,163,0.1)" : testStatus === "fail" ? "rgba(255,77,106,0.1)" : "rgba(255,255,255,0.05)", color: testStatus === "ok" ? "#00FFA3" : testStatus === "fail" ? "#FF4D6A" : "#6B7A99", border: `1px solid ${testStatus === "ok" ? "rgba(0,255,163,0.2)" : testStatus === "fail" ? "rgba(255,77,106,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
                       {testStatus === "testing" ? <RefreshCw size={12} style={{ animation: "spin 1s linear infinite" }} /> : testStatus === "ok" ? <Check size={12} /> : testStatus === "fail" ? <AlertTriangle size={12} /> : null}
                       {testStatus === "idle" ? "Tester" : testStatus === "testing" ? "Test..." : testStatus === "ok" ? "Connecté" : "Erreur"}
@@ -153,27 +142,6 @@ export function SettingsPage({ settings, onSave }: Props) {
                     style={{ width: 200, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#E8EDF5", fontSize: 12.5, outline: "none", fontFamily: "'JetBrains Mono', monospace" }}>
                     {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
-                } divider={false} />
-              </Section>
-
-              <Section title="Paramètres de génération">
-                <Row label="Température" description="Créativité du modèle (0 = déterministe, 1 = créatif)" right={
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <input type="range" min={0} max={1} step={0.1} value={local.temperature}
-                      onChange={e => patch({ temperature: parseFloat(e.target.value) })}
-                      style={{ width: 120, accentColor: "#00D4FF" }} />
-                    <span style={{ fontSize: 13, color: "#00D4FF", fontFamily: "'JetBrains Mono', monospace", width: 28, textAlign: "center" }}>{local.temperature}</span>
-                  </div>
-                } />
-                <Row label="Max tokens" description="Longueur maximale des messages générés" right={
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <input type="number" value={local.maxTokens} min={100} max={2000} onChange={e => patch({ maxTokens: Number(e.target.value) })}
-                      style={{ width: 80, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "6px 10px", color: "#E8EDF5", fontSize: 13, outline: "none", textAlign: "center", fontFamily: "'JetBrains Mono', monospace" }}
-                      onFocus={e => { e.target.style.borderColor = "rgba(0,212,255,0.3)"; }}
-                      onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }}
-                    />
-                    <span style={{ fontSize: 11.5, color: "#4A5568" }}>tokens</span>
-                  </div>
                 } divider={false} />
               </Section>
 

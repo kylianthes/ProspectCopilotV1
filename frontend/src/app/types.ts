@@ -18,8 +18,6 @@ export interface Prospect {
   id: string;
   name: string;
   company?: string;
-  role?: string;
-  email?: string;
   niche: string;
   notes: string;
   status: ProspectStatus;
@@ -40,13 +38,8 @@ export interface Prospect {
 
 export interface AISettings {
   userName: string;
-  ollamaEndpoint: string;
   model: string;
   defaultTone: MessageTone;
   defaultMessageType: MessageType;
-  maxTokens: number;
-  temperature: number;
 }
 
-// Kept for unused Figma Make showcase components.
-export type NetworkId = "instagram" | "tiktok" | "linkedin" | "twitter" | "youtube";

@@ -43,7 +43,7 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
   const activeStatuses = TABS.find(t => t.id === activeTab)!.statuses;
   const filtered = activeTab === "all" ? relevantProspects : relevantProspects.filter(p => activeStatuses.includes(p.status));
 
-  const selected = prospects.find(p => p.id === selectedId) ?? filtered[0] ?? null;
+  const selected = filtered.find(p => p.id === selectedId) ?? filtered[0] ?? null;
 
   const counts: Record<FilterTab, number> = {
     all:       relevantProspects.length,
@@ -70,7 +70,7 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
     }
   };
   const handleSaveEdit = () => {
-    if (selected) { onUpdate(selected.id, { generatedMessage: draft }); setEditing(false); }
+    if (selected) { onUpdate(selected.id, { generatedMessage: draft, messageType: selected.messageType }); setEditing(false); }
   };
   const startEdit = () => { setDraft(selected?.generatedMessage ?? ""); setEditing(true); };
 
@@ -212,9 +212,9 @@ export function MessagesPage({ prospects, onUpdate }: Props) {
             {/* Action bar */}
             <div style={{ padding: "14px 26px", borderTop: "1px solid rgba(255,255,255,0.045)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
               <div style={{ fontSize: 12, color: "#3D4E6B", flex: 1 }}>
-                {selected.status === "validated" ? "? Message approuvé - prêt Ã  être envoyé manuellement" :
-                 selected.status === "sent"       ? "? Message marqué comme envoyé" :
-                 selected.status === "rejected"   ? "Message rejeté - Ã  régénérer si besoin" :
+                {selected.status === "validated" ? "Message approuve - pret a etre envoye manuellement" :
+                 selected.status === "sent"       ? "Message marque comme envoye" :
+                 selected.status === "rejected"   ? "Message rejete - a regenerer si besoin" :
                  "Examinez le message ci-dessus et prenez une décision."}
               </div>
               <button onClick={handleCopy} style={{ display: "flex", alignItems: "center", gap: 6, background: copied ? "rgba(0,255,163,0.1)" : "rgba(255,255,255,0.04)", color: copied ? "#00FFA3" : "#8895A7", border: `1px solid ${copied ? "rgba(0,255,163,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, padding: "9px 14px", fontSize: 12.5, cursor: "pointer" }}>

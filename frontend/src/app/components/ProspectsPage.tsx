@@ -10,6 +10,8 @@ interface Props {
   onAnalyze: (id: string) => void;
   onGenerate: (id: string, tone: MessageTone, type: MessageType) => void;
   onImportCsv: (file: File) => void;
+  defaultTone: MessageTone;
+  defaultMessageType: MessageType;
 }
 
 const STATUS_META: Record<ProspectStatus, { label: string; color: string; bg: string }> = {
@@ -62,14 +64,14 @@ function ScoreRing({ score }: { score: number }) {
 
 type PanelTab = "analyse" | "message" | "notes";
 
-export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze, onGenerate, onImportCsv }: Props) {
+export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze, onGenerate, onImportCsv, defaultTone, defaultMessageType }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(prospects[0]?.id ?? null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<ProspectStatus | "all">("all");
   const [filterNiche, setFilterNiche] = useState("all");
   const [panelTab, setPanelTab] = useState<PanelTab>("analyse");
-  const [tone, setTone] = useState<MessageTone>("professionnel");
-  const [msgType, setMsgType] = useState<MessageType>("email");
+  const [tone, setTone] = useState<MessageTone>(defaultTone);
+  const [msgType, setMsgType] = useState<MessageType>(defaultMessageType);
   const [editingMsg, setEditingMsg] = useState(false);
   const [msgDraft, setMsgDraft] = useState("");
   const [copied, setCopied] = useState(false);
@@ -100,6 +102,11 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
     }
   }, [prospects, selectedId]);
 
+  useEffect(() => {
+    setTone(defaultTone);
+    setMsgType(defaultMessageType);
+  }, [defaultTone, defaultMessageType]);
+
   const handleSelectProspect = (p: Prospect) => {
     setSelectedId(p.id);
     setNotesText(p.notes ?? "");
@@ -124,7 +131,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
   };
 
   const handleSaveEdit = () => {
-    if (selected) { onUpdate(selected.id, { generatedMessage: msgDraft }); setEditingMsg(false); }
+    if (selected) { onUpdate(selected.id, { generatedMessage: msgDraft, messageType: selected.messageType }); setEditingMsg(false); }
   };
 
   const handleSaveNotes = () => {
@@ -237,12 +244,10 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
               <div>
                 <div style={{ fontSize: 16, color: "#E8EDF5", fontWeight: 600 }}>{selected.name}</div>
                 <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4, flexWrap: "wrap" }}>
-                  {selected.role && <span style={{ fontSize: 12, color: "#6B7A99" }}>{selected.role}</span>}
                   {selected.company && <span style={{ fontSize: 12, color: "#4A5568" }}>@ {selected.company}</span>}
                   <div style={{ background: STATUS_META[selected.status].bg, borderRadius: 5, padding: "2px 8px", fontSize: 10.5, color: STATUS_META[selected.status].color }}>{STATUS_META[selected.status].label}</div>
                 </div>
                 <div style={{ display: "flex", gap: 12, marginTop: 5 }}>
-                  {selected.email && <span style={{ fontSize: 11, color: "#3D4E6B", fontFamily: "'JetBrains Mono', monospace" }}>{selected.email}</span>}
                   {selected.niche && <span style={{ fontSize: 11, color: "#4A5568" }}>{selected.niche}</span>}
                 </div>
               </div>
@@ -424,7 +429,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                   <div>
                     {/* Meta row */}
                     <div style={{ display: "flex", gap: 8, marginBottom: 14, alignItems: "center" }}>
-                      <div style={{ background: "rgba(124,106,247,0.1)", border: "1px solid rgba(124,106,247,0.18)", borderRadius: 5, padding: "2px 8px", fontSize: 11, color: "#9B8FF5" }}>? Message IA</div>
+                      <div style={{ background: "rgba(124,106,247,0.1)", border: "1px solid rgba(124,106,247,0.18)", borderRadius: 5, padding: "2px 8px", fontSize: 11, color: "#9B8FF5" }}>Message IA</div>
                       {selected.messageTone && <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 5, padding: "2px 8px", fontSize: 11, color: "#6B7A99" }}>{TONES.find(t=>t.value===selected.messageTone)?.label}</div>}
                       {selected.messageType && <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 5, padding: "2px 8px", fontSize: 11, color: "#6B7A99" }}>{MSG_TYPES.find(t=>t.value===selected.messageType)?.label}</div>}
                       <div style={{ flex: 1 }} />
@@ -478,7 +483,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                         {/* Re-generate */}
                         <div style={{ flex: 1 }} />
                         <button onClick={handleGenerate} title="Régénérer" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(124,106,247,0.08)", color: "#9B8FF5", border: "1px solid rgba(124,106,247,0.15)", borderRadius: 8, padding: "8px 12px", fontSize: 11.5, cursor: "pointer" }}>
-                          ? Régénérer
+                          Regenerer
                         </button>
                       </div>
                     )}
@@ -497,7 +502,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                   onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.07)"; handleSaveNotes(); }}
                 />
                 <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 11, color: "#3D4E6B" }}>Sauvegardé automatiquement Ã  la perte de focus.</span>
+                  <span style={{ fontSize: 11, color: "#3D4E6B" }}>Sauvegarde automatiquement a la perte de focus.</span>
                   <button onClick={handleSaveNotes} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(0,212,255,0.08)", color: "#00D4FF", border: "1px solid rgba(0,212,255,0.18)", borderRadius: 7, padding: "5px 12px", fontSize: 11.5, cursor: "pointer" }}>
                     <Check size={12} /> Sauvegarder
                   </button>
@@ -510,8 +515,6 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                     {[
                       { label: "Nom",       value: selected.name },
                       { label: "Entreprise",value: selected.company },
-                      { label: "RÃ´le",      value: selected.role },
-                      { label: "Email",     value: selected.email },
                       { label: "Niche",     value: selected.niche },
                       { label: "Ajouté le", value: new Date(selected.addedAt).toLocaleDateString("fr-FR") },
                     ].filter(row => row.value).map((row, i, arr) => (

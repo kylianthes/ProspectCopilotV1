@@ -89,6 +89,7 @@ export default function App() {
   const updateProspect = async (id: string, patch: Partial<Prospect>) => {
     setProspects(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
 
+    const currentProspect = prospects.find(p => p.id === id);
     const payload: Record<string, unknown> = {};
     if (patch.name !== undefined) payload.name = patch.name;
     if (patch.company !== undefined) payload.company = patch.company;
@@ -99,7 +100,8 @@ export default function App() {
     if (patch.aiSummary !== undefined) payload.summary = patch.aiSummary;
     if (patch.aiCategory !== undefined) payload.category = patch.aiCategory;
     if (patch.generatedMessage !== undefined) {
-      if (patch.messageType === "dm") payload.dm_message = patch.generatedMessage;
+      const messageType = patch.messageType ?? currentProspect?.messageType;
+      if (messageType === "dm") payload.dm_message = patch.generatedMessage;
       else payload.email_message = patch.generatedMessage;
     }
 
@@ -234,6 +236,8 @@ export default function App() {
               onAnalyze={analyzeProspect}
               onGenerate={generateMessage}
               onImportCsv={importCsv}
+              defaultTone={aiSettings.defaultTone}
+              defaultMessageType={aiSettings.defaultMessageType}
             />
           )}
           {page === "messages" && (

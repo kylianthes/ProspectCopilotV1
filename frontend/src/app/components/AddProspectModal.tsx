@@ -8,7 +8,7 @@ interface Props {
 }
 
 export function AddProspectModal({ onClose, onAdd }: Props) {
-  const [form, setForm] = useState({ name: "", company: "", role: "", email: "", source: "", bio: "" });
+  const [form, setForm] = useState({ name: "", company: "", source: "", bio: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const patch = (key: keyof typeof form, value: string) => {
@@ -32,8 +32,6 @@ export function AddProspectModal({ onClose, onAdd }: Props) {
     onAdd({
       name: form.name.trim(),
       company: form.company.trim() || undefined,
-      role: form.role.trim() || undefined,
-      email: form.email.trim() || undefined,
       niche: form.source.trim() || "manual",
       notes: form.bio.trim(),
     });
@@ -77,14 +75,6 @@ export function AddProspectModal({ onClose, onAdd }: Props) {
             <div>
               <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Entreprise</label>
               <input value={form.company} onChange={event => patch("company", event.target.value)} placeholder="Northstar" style={inputStyle()} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Role</label>
-              <input value={form.role} onChange={event => patch("role", event.target.value)} placeholder="Fondatrice" style={inputStyle()} />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, color: "#6B7A99", display: "block", marginBottom: 5 }}>Email</label>
-              <input value={form.email} onChange={event => patch("email", event.target.value)} placeholder="contact@example.com" style={inputStyle()} />
             </div>
           </div>
           <div style={{ marginBottom: 16 }}>
