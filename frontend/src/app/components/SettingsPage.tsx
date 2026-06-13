@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Cpu, Palette, Database, Save, Check, RefreshCw, AlertTriangle } from "lucide-react";
+import { Cpu, Save, Check, RefreshCw, AlertTriangle } from "lucide-react";
 import type { AISettings, MessageTone, MessageType } from "../types";
 
 interface Props {
@@ -7,12 +7,12 @@ interface Props {
   onSave: (s: AISettings) => void;
 }
 
-type Tab = "ia" | "apparence" | "donnees";
+type Tab = "ia";
 
 const TABS: { id: Tab; label: string; icon: React.ComponentType<{ size?: number }> }[] = [
   { id: "ia",         label: "Moteur IA",  icon: Cpu },
-  { id: "apparence",  label: "Apparence",  icon: Palette },
-  { id: "donnees",    label: "Données",    icon: Database },
+
+
 ];
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -20,8 +20,8 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 const MODELS = ["qwen2.5:1.5b", "qwen2.5:7b", "llama3:latest", "llama3.1:8b", "llama3.2:3b", "mistral:7b", "phi3:mini", "gemma2:9b"];
 const TONES: { value: MessageTone; label: string; desc: string }[] = [
   { value: "professionnel", label: "Professionnel", desc: "Formel, B2B, respectueux" },
-  { value: "amical",        label: "Amical",        desc: "Décontracté, accessible" },
-  { value: "direct",        label: "Direct",        desc: "Court, orienté action" },
+  { value: "amical",        label: "Amical",        desc: "DÃ©contractÃ©, accessible" },
+  { value: "direct",        label: "Direct",        desc: "Court, orientÃ© action" },
   { value: "chaleureux",    label: "Chaleureux",    desc: "Personnel, empathique" },
 ];
 const MSG_TYPES: { value: MessageType; label: string }[] = [
@@ -82,7 +82,7 @@ export function SettingsPage({ settings, onSave }: Props) {
 
       {/* Left tab nav */}
       <div style={{ width: 200, flexShrink: 0, background: "#0C1220", borderRight: "1px solid rgba(255,255,255,0.045)", padding: "24px 10px" }}>
-        <div style={{ fontSize: 9, color: "#1E2D45", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase", padding: "0 10px", marginBottom: 10 }}>Paramètres</div>
+        <div style={{ fontSize: 9, color: "#1E2D45", fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.12em", textTransform: "uppercase", padding: "0 10px", marginBottom: 10 }}>ParamÃ¨tres</div>
         {TABS.map(t => {
           const active = tab === t.id;
           const Icon = t.icon;
@@ -106,7 +106,7 @@ export function SettingsPage({ settings, onSave }: Props) {
             <p style={{ color: "#4A5568", fontSize: 12.5, margin: "3px 0 0" }}>Configurez Prospect Copilot</p>
           </div>
           <button onClick={handleSave} style={{ display: "flex", alignItems: "center", gap: 7, background: saved ? "rgba(0,255,163,0.12)" : "linear-gradient(135deg, #00D4FF 0%, #0094CC 100%)", color: saved ? "#00FFA3" : "#0A0E17", border: saved ? "1px solid rgba(0,255,163,0.25)" : "none", borderRadius: 9, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}>
-            {saved ? <Check size={14} /> : <Save size={14} />} {saved ? "Sauvegardé ?" : "Sauvegarder"}
+            {saved ? <Check size={14} /> : <Save size={14} />} {saved ? "SauvegardÃ©" : "Sauvegarder"}
           </button>
         </div>
 
@@ -116,7 +116,7 @@ export function SettingsPage({ settings, onSave }: Props) {
           {tab === "ia" && (
             <>
               <Section title="Profil utilisateur">
-                <Row label="Nom utilisateur" description="Nom affiché dans les paramètres locaux" right={
+                <Row label="Nom utilisateur" description="Nom affichÃ© dans les paramÃ¨tres locaux" right={
                   <input value={local.userName} onChange={e => patch({ userName: e.target.value })}
                     placeholder="Votre nom"
                     style={{ width: 220, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#E8EDF5", fontSize: 12.5, outline: "none" }}
@@ -127,17 +127,17 @@ export function SettingsPage({ settings, onSave }: Props) {
               </Section>
 
               <Section title="Connexion Ollama">
-                <Row label="Endpoint Ollama" description="Serveur local utilise par Prospect Copilot" right={
+                <Row label="Endpoint Ollama" description="Serveur local utilisÃ© par Prospect Copilot" right={
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <span style={{ width: 220, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#6B7A99", fontSize: 12.5, fontFamily: "'JetBrains Mono', monospace" }}>http://127.0.0.1:11434</span>
                     <button onClick={testConnection} style={{ display: "flex", alignItems: "center", gap: 5, background: testStatus === "ok" ? "rgba(0,255,163,0.1)" : testStatus === "fail" ? "rgba(255,77,106,0.1)" : "rgba(255,255,255,0.05)", color: testStatus === "ok" ? "#00FFA3" : testStatus === "fail" ? "#FF4D6A" : "#6B7A99", border: `1px solid ${testStatus === "ok" ? "rgba(0,255,163,0.2)" : testStatus === "fail" ? "rgba(255,77,106,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 7, padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>
                       {testStatus === "testing" ? <RefreshCw size={12} style={{ animation: "spin 1s linear infinite" }} /> : testStatus === "ok" ? <Check size={12} /> : testStatus === "fail" ? <AlertTriangle size={12} /> : null}
-                      {testStatus === "idle" ? "Tester" : testStatus === "testing" ? "Test..." : testStatus === "ok" ? "Connecté" : "Erreur"}
+                      {testStatus === "idle" ? "Tester" : testStatus === "testing" ? "Test..." : testStatus === "ok" ? "ConnectÃ©" : "Erreur"}
                     </button>
                     <style>{`@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }`}</style>
                   </div>
                 } />
-                <Row label="Modèle" description="Modèle Ollama Ã  utiliser pour l'analyse et la génération" right={
+                <Row label="ModÃ¨le" description="ModÃ¨le Ollama Ã  utiliser pour l'analyse et la gÃ©nÃ©ration" right={
                   <select value={local.model} onChange={e => patch({ model: e.target.value })}
                     style={{ width: 200, background: "#0C1420", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 7, padding: "7px 12px", color: "#E8EDF5", fontSize: 12.5, outline: "none", fontFamily: "'JetBrains Mono', monospace" }}>
                     {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
@@ -145,8 +145,8 @@ export function SettingsPage({ settings, onSave }: Props) {
                 } divider={false} />
               </Section>
 
-              <Section title="Defaults de génération">
-                <Row label="Ton par défaut" description="Ton utilisé si non spécifié manuellement" right={
+              <Section title="Defaults de gÃ©nÃ©ration">
+                <Row label="Ton par dÃ©faut" description="Ton utilisÃ© si non spÃ©cifiÃ© manuellement" right={
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     {TONES.map(t => (
                       <button key={t.value} onClick={() => patch({ defaultTone: t.value })}
@@ -156,7 +156,7 @@ export function SettingsPage({ settings, onSave }: Props) {
                     ))}
                   </div>
                 } />
-                <Row label="Type de message par défaut" right={
+                <Row label="Type de message par dÃ©faut" right={
                   <div style={{ display: "flex", gap: 6 }}>
                     {MSG_TYPES.map(t => (
                       <button key={t.value} onClick={() => patch({ defaultMessageType: t.value })}
@@ -170,39 +170,6 @@ export function SettingsPage({ settings, onSave }: Props) {
             </>
           )}
 
-          {/* -- APPARENCE TAB -- */}
-          {tab === "apparence" && (
-            <Section title="Thème">
-              <Row label="Thème" description="Seul le thème sombre est disponible pour l'instant" right={
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {["#090D18","#0F1117","#00D4FF","#00FFA3"].map(c => <div key={c} style={{ width: 16, height: 16, borderRadius: 4, background: c, border: "1px solid rgba(255,255,255,0.1)" }} />)}
-                  </div>
-                  <span style={{ fontSize: 12.5, color: "#00D4FF", background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.2)", borderRadius: 6, padding: "3px 10px" }}>Cyber Dark</span>
-                </div>
-              } />
-              <Row label="Police interface" description="Inter pour l'UI, JetBrains Mono pour les données" right={
-                <div style={{ display: "flex", gap: 6 }}>
-                  <span style={{ fontSize: 12.5, color: "#D1D9E6", background: "rgba(255,255,255,0.05)", borderRadius: 6, padding: "3px 10px" }}>Inter</span>
-                  <span style={{ fontSize: 12, color: "#6B7A99", background: "rgba(255,255,255,0.03)", borderRadius: 6, padding: "3px 10px", fontFamily: "'JetBrains Mono', monospace" }}>JetBrains Mono</span>
-                </div>
-              } divider={false} />
-            </Section>
-          )}
-
-          {/* -- DONNÉES TAB -- */}
-          {tab === "donnees" && (
-            <>
-              <Section title="Stockage local">
-                <Row label="Emplacement des données" description="Les données restent sur votre machine (aucun cloud)" right={
-                  <span style={{ fontSize: 12, color: "#00FFA3", background: "rgba(0,255,163,0.08)", borderRadius: 6, padding: "3px 10px" }}>Local uniquement</span>
-                } />
-                <Row label="Import CSV" description="Disponible depuis la page Prospects" right={
-                  <span style={{ fontSize: 12, color: "#6B7A99", background: "rgba(255,255,255,0.04)", borderRadius: 6, padding: "3px 10px" }}>Prospects</span>
-                } divider={false} />
-              </Section>
-            </>
-          )}
         </div>
       </div>
     </div>

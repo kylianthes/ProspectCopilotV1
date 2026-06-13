@@ -17,13 +17,13 @@ interface Props {
 const STATUS_META: Record<ProspectStatus, { label: string; color: string; bg: string }> = {
   new:        { label: "Nouveau",       color: "#8895A7", bg: "rgba(136,149,167,0.1)" },
   analyzing:  { label: "Analyse IA...",  color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
-  analyzed:   { label: "Analysé",       color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
-  generating: { label: "Génération...",  color: "#7C6AF7", bg: "rgba(124,106,247,0.1)" },
-  draft:      { label: "Message prêt", color: "#FFB800", bg: "rgba(255,184,0,0.1)"   },
-  validated:  { label: "Validé",        color: "#00FFA3", bg: "rgba(0,255,163,0.1)"   },
-  sent:       { label: "Envoyé",        color: "#00FFA3", bg: "rgba(0,255,163,0.08)"  },
-  rejected:   { label: "Rejeté",        color: "#FF4D6A", bg: "rgba(255,77,106,0.08)" },
-  archived:   { label: "Archivé",       color: "#3D4E6B", bg: "rgba(61,78,107,0.12)"  },
+  analyzed:   { label: "AnalysÃ©",       color: "#00D4FF", bg: "rgba(0,212,255,0.1)"   },
+  generating: { label: "GÃ©nÃ©ration...",  color: "#7C6AF7", bg: "rgba(124,106,247,0.1)" },
+  draft:      { label: "Message prÃªt", color: "#FFB800", bg: "rgba(255,184,0,0.1)"   },
+  validated:  { label: "ValidÃ©",        color: "#00FFA3", bg: "rgba(0,255,163,0.1)"   },
+  sent:       { label: "EnvoyÃ©",        color: "#00FFA3", bg: "rgba(0,255,163,0.08)"  },
+  rejected:   { label: "RejetÃ©",        color: "#FF4D6A", bg: "rgba(255,77,106,0.08)" },
+  archived:   { label: "ArchivÃ©",       color: "#3D4E6B", bg: "rgba(61,78,107,0.12)"  },
 };
 
 const TONES: { value: MessageTone; label: string }[] = [
@@ -201,7 +201,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
         {/* List */}
         <div style={{ flex: 1, overflowY: "auto" }}>
           {filtered.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 16px", color: "#3D4E6B", fontSize: 13 }}>Aucun prospect trouvé</div>
+            <div style={{ textAlign: "center", padding: "40px 16px", color: "#3D4E6B", fontSize: 13 }}>Aucun prospect trouvÃ©</div>
           )}
           {filtered.map(p => {
             const meta = STATUS_META[p.status];
@@ -217,7 +217,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 12.5, color: "#D1D9E6", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
-                  <div style={{ fontSize: 11, color: "#4A5568", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>{p.company ? `${p.company} · ` : ""}{p.niche}</div>
+                  <div style={{ fontSize: 11, color: "#4A5568", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>{p.company ? `${p.company} Â· ` : ""}{p.niche}</div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
                   {p.aiScore !== undefined && (
@@ -287,8 +287,8 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                     <div style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(0,212,255,0.07)", border: "1px solid rgba(0,212,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                       <Brain size={24} style={{ color: "#00D4FF", opacity: 0.6 }} />
                     </div>
-                    <div style={{ fontSize: 14, color: "#8895A7", marginBottom: 6 }}>Prospect non analysé</div>
-                    <div style={{ fontSize: 12, color: "#4A5568", marginBottom: 24, lineHeight: 1.6 }}>L'IA va calculer un score de pertinence,<br />générer un résumé et catégoriser ce prospect.</div>
+                    <div style={{ fontSize: 14, color: "#8895A7", marginBottom: 6 }}>Prospect non analysÃ©</div>
+                    <div style={{ fontSize: 12, color: "#4A5568", marginBottom: 24, lineHeight: 1.6 }}>L'IA va calculer un score de pertinence,<br />gÃ©nÃ©rer un rÃ©sumÃ© et catÃ©goriser ce prospect.</div>
                     <button onClick={() => onAnalyze(selected.id)}
                       style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #00D4FF 0%, #0094CC 100%)", color: "#0A0E17", border: "none", borderRadius: 9, padding: "11px 24px", fontSize: 13.5, fontWeight: 700, cursor: "pointer", boxShadow: "0 0 20px rgba(0,212,255,0.3)" }}>
                       <Brain size={16} /> Analyser avec IA
@@ -326,7 +326,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                     )}
                     <div style={{ textAlign: "center", padding: "20px" }}>
                       <Loader size={24} style={{ color: "#7C6AF7", animation: "spin 1s linear infinite" }} />
-                      <div style={{ fontSize: 13, color: "#7C6AF7", marginTop: 10 }}>Génération du message en cours...</div>
+                      <div style={{ fontSize: 13, color: "#7C6AF7", marginTop: 10 }}>GÃ©nÃ©ration du message en cours...</div>
                     </div>
                   </div>
                 )}
@@ -352,7 +352,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                     {/* Summary */}
                     {selected.aiSummary && (
                       <div style={{ background: "#0D1420", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 10, padding: "14px 16px", marginBottom: 20 }}>
-                        <div style={{ fontSize: 10.5, color: "#3D4E6B", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Résumé IA</div>
+                        <div style={{ fontSize: 10.5, color: "#3D4E6B", fontFamily: "'JetBrains Mono', monospace", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>RÃ©sumÃ© IA</div>
                         <p style={{ fontSize: 13, color: "#B8C5D8", lineHeight: 1.7, margin: 0 }}>{selected.aiSummary}</p>
                       </div>
                     )}
@@ -360,7 +360,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                     {/* Generate message CTA - shown if no message yet */}
                     {!["draft","validated","sent","rejected"].includes(selected.status) && (
                       <div style={{ background: "rgba(124,106,247,0.06)", border: "1px solid rgba(124,106,247,0.15)", borderRadius: 10, padding: "16px" }}>
-                        <div style={{ fontSize: 11.5, color: "#9B8FF5", fontWeight: 500, marginBottom: 12 }}>Générer un message personnalisé</div>
+                        <div style={{ fontSize: 11.5, color: "#9B8FF5", fontWeight: 500, marginBottom: 12 }}>GÃ©nÃ©rer un message personnalisÃ©</div>
                         <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
                           {TONES.map(t => (
                             <button key={t.value} onClick={() => setTone(t.value)}
@@ -379,7 +379,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                         </div>
                         <button onClick={handleGenerate}
                           style={{ display: "flex", alignItems: "center", gap: 7, background: "linear-gradient(135deg, #7C6AF7 0%, #5A4FCC 100%)", color: "#fff", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                          <MessageSquare size={14} /> Générer le message
+                          <MessageSquare size={14} /> GÃ©nÃ©rer le message
                         </button>
                       </div>
                     )}
@@ -394,9 +394,9 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                 {!selected.generatedMessage && !["draft","validated","sent","rejected"].includes(selected.status) && (
                   <div style={{ textAlign: "center", padding: "40px 20px" }}>
                     <MessageSquare size={28} style={{ color: "#3D4E6B", marginBottom: 12 }} />
-                    <div style={{ fontSize: 14, color: "#6B7A99", marginBottom: 6 }}>Aucun message généré</div>
+                    <div style={{ fontSize: 14, color: "#6B7A99", marginBottom: 6 }}>Aucun message gÃ©nÃ©rÃ©</div>
                     <div style={{ fontSize: 12, color: "#4A5568", marginBottom: selected.aiScore !== undefined ? 20 : 0, lineHeight: 1.6 }}>
-                      {selected.aiScore !== undefined ? "Configurez le ton et générez un message depuis l'onglet Analyse." : "Analysez d'abord le prospect avec l'IA."}
+                      {selected.aiScore !== undefined ? "Configurez le ton et gÃ©nÃ©rez un message depuis l'onglet Analyse." : "Analysez d'abord le prospect avec l'IA."}
                     </div>
                     {selected.aiScore !== undefined && (
                       <div>
@@ -418,7 +418,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                         </div>
                         <button onClick={handleGenerate}
                           style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "linear-gradient(135deg, #7C6AF7 0%, #5A4FCC 100%)", color: "#fff", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                          <MessageSquare size={14} /> Générer le message
+                          <MessageSquare size={14} /> GÃ©nÃ©rer le message
                         </button>
                       </div>
                     )}
@@ -463,7 +463,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                           <Edit3 size={13} /> Modifier
                         </button>
                         <button onClick={handleCopy} style={{ display: "flex", alignItems: "center", gap: 6, background: copied ? "rgba(0,255,163,0.1)" : "rgba(255,255,255,0.04)", color: copied ? "#00FFA3" : "#8895A7", border: `1px solid ${copied ? "rgba(0,255,163,0.2)" : "rgba(255,255,255,0.07)"}`, borderRadius: 8, padding: "8px 14px", fontSize: 12.5, cursor: "pointer" }}>
-                          {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copié !" : "Copier"}
+                          {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "CopiÃ© !" : "Copier"}
                         </button>
                         {selected.status === "draft" && (
                           <>
@@ -477,13 +477,13 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                         )}
                         {selected.status === "validated" && (
                           <button onClick={() => onUpdate(selected.id, { status: "sent" })} style={{ display: "flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg, #00D4FF 0%, #0094CC 100%)", color: "#0A0E17", border: "none", borderRadius: 8, padding: "8px 18px", fontSize: 12.5, fontWeight: 700, cursor: "pointer", boxShadow: "0 0 14px rgba(0,212,255,0.2)" }}>
-                            Marquer comme envoyé
+                            Marquer comme envoyÃ©
                           </button>
                         )}
                         {/* Re-generate */}
                         <div style={{ flex: 1 }} />
-                        <button onClick={handleGenerate} title="Régénérer" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(124,106,247,0.08)", color: "#9B8FF5", border: "1px solid rgba(124,106,247,0.15)", borderRadius: 8, padding: "8px 12px", fontSize: 11.5, cursor: "pointer" }}>
-                          Regenerer
+                        <button onClick={handleGenerate} title="RÃ©gÃ©nÃ©rer" style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(124,106,247,0.08)", color: "#9B8FF5", border: "1px solid rgba(124,106,247,0.15)", borderRadius: 8, padding: "8px 12px", fontSize: 11.5, cursor: "pointer" }}>
+                          RÃ©gÃ©nÃ©rer
                         </button>
                       </div>
                     )}
@@ -502,7 +502,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                   onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.07)"; handleSaveNotes(); }}
                 />
                 <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 11, color: "#3D4E6B" }}>Sauvegarde automatiquement a la perte de focus.</span>
+                  <span style={{ fontSize: 11, color: "#3D4E6B" }}>SauvegardÃ© automatiquement Ã  la perte de focus.</span>
                   <button onClick={handleSaveNotes} style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(0,212,255,0.08)", color: "#00D4FF", border: "1px solid rgba(0,212,255,0.18)", borderRadius: 7, padding: "5px 12px", fontSize: 11.5, cursor: "pointer" }}>
                     <Check size={12} /> Sauvegarder
                   </button>
@@ -516,7 +516,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
                       { label: "Nom",       value: selected.name },
                       { label: "Entreprise",value: selected.company },
                       { label: "Niche",     value: selected.niche },
-                      { label: "Ajouté le", value: new Date(selected.addedAt).toLocaleDateString("fr-FR") },
+                      { label: "AjoutÃ© le", value: new Date(selected.addedAt).toLocaleDateString("fr-FR") },
                     ].filter(row => row.value).map((row, i, arr) => (
                       <div key={row.label} style={{ display: "flex", padding: "10px 14px", borderBottom: i < arr.length-1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                         <span style={{ fontSize: 11.5, color: "#4A5568", width: 90, flexShrink: 0 }}>{row.label}</span>
@@ -533,7 +533,7 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "#2D3D5A" }}>
           <div style={{ textAlign: "center" }}>
             <Users size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
-            <div style={{ fontSize: 14, color: "#3D4E6B" }}>Sélectionnez un prospect</div>
+            <div style={{ fontSize: 14, color: "#3D4E6B" }}>SÃ©lectionnez un prospect</div>
           </div>
         </div>
       )}
