@@ -26,6 +26,11 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "windows": {
+      "nsis": {
+        "installerHooks": "installer-hooks.nsh"
+      }
+    },
     "externalBin": [
       "binaries/prospect-copilot-backend"
     ],
