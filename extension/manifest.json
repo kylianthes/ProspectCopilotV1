@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Prospect Copilot",
+  "version": "1.5.0",
+  "description": "Ajoute manuellement un profil Instagram ou TikTok visible dans Prospect Copilot.",
+  "permissions": ["activeTab"],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*"
+  ],
+  "action": {
+    "default_title": "Prospect Copilot",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.instagram.com/*",
+        "https://www.tiktok.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
