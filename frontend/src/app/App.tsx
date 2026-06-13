@@ -57,6 +57,7 @@ export default function App() {
   });
   const [showAddModal, setShowAddModal] = useState(false);
   const [aiOnline, setAiOnline] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const loadProspects = async () => {
     const response = await fetch(`${API_BASE_URL}/prospects`);
@@ -66,7 +67,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    loadProspects().catch(console.error);
+    loadProspects().catch(() => setErrorMessage("Impossible de charger les prospects. Vérifiez que le backend est lancé."));
 
     const checkAiHealth = () => {
       const params = new URLSearchParams({ model: aiSettings.model });
@@ -87,6 +88,7 @@ export default function App() {
   };
 
   const updateProspect = async (id: string, patch: Partial<Prospect>) => {
+    const previousProspects = prospects;
     setProspects(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
 
     const currentProspect = prospects.find(p => p.id === id);
@@ -106,49 +108,84 @@ export default function App() {
     }
 
     if (Object.keys(payload).length === 0) return;
-    const response = await fetch(`${API_BASE_URL}/prospects/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (response.ok) {
-      const updated: ApiProspect = await response.json();
-      setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(updated) : p));
+    try {
+      const response = await fetch(`${API_BASE_URL}/prospects/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const updated: ApiProspect = await response.json();
+        setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(updated) : p));
+        setErrorMessage(null);
+        return;
+      }
+      setErrorMessage("Impossible de sauvegarder les modifications du prospect.");
+      setProspects(previousProspects);
+      await loadProspects().catch(() => undefined);
+    } catch {
+      setErrorMessage("Impossible de contacter le backend pour sauvegarder le prospect.");
+      setProspects(previousProspects);
+      await loadProspects().catch(() => undefined);
     }
   };
 
   const addProspect = async (data: Omit<Prospect, "id" | "status" | "addedAt">) => {
-    const response = await fetch(`${API_BASE_URL}/prospects`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: data.name,
-        company: data.company,
-        bio: data.notes?.trim() || data.niche,
-        source: data.niche,
-      }),
-    });
-    if (response.ok) {
-      const created: ApiProspect = await response.json();
-      setProspects(prev => [fromApiProspect(created), ...prev]);
+    try {
+      const response = await fetch(`${API_BASE_URL}/prospects`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          company: data.company,
+          bio: data.notes?.trim() || data.niche,
+          source: data.niche,
+        }),
+      });
+      if (response.ok) {
+        const created: ApiProspect = await response.json();
+        setProspects(prev => [fromApiProspect(created), ...prev]);
+        setErrorMessage(null);
+        setShowAddModal(false);
+      } else {
+        setErrorMessage("Impossible de créer le prospect. Vérifiez les champs obligatoires.");
+      }
+    } catch {
+      setErrorMessage("Impossible de contacter le backend pour créer le prospect.");
     }
-    setShowAddModal(false);
   };
 
   const deleteProspect = async (id: string) => {
-    await fetch(`${API_BASE_URL}/prospects/${id}`, { method: "DELETE" });
-    setProspects(prev => prev.filter(p => p.id !== id));
+    try {
+      const response = await fetch(`${API_BASE_URL}/prospects/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        setProspects(prev => prev.filter(p => p.id !== id));
+        setErrorMessage(null);
+      } else {
+        setErrorMessage("Impossible de supprimer le prospect.");
+      }
+    } catch {
+      setErrorMessage("Impossible de contacter le backend pour supprimer le prospect.");
+    }
   };
 
   const importCsv = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetch(`${API_BASE_URL}/prospects/import-csv`, {
-      method: "POST",
-      body: formData,
-    });
-    if (response.ok) {
-      await loadProspects();
+    try {
+      const response = await fetch(`${API_BASE_URL}/prospects/import-csv`, {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        await loadProspects();
+        setErrorMessage(null);
+      } else {
+        const detail = await response.json().catch(() => null);
+        setErrorMessage(`Import CSV impossible: ${detail?.detail ?? "format invalide"}`);
+      }
+    } catch {
+      setErrorMessage("Impossible de contacter le backend pour importer le CSV.");
     }
   };
 
@@ -163,8 +200,11 @@ export default function App() {
       if (!response.ok) throw new Error("Unable to analyze prospect");
       const analyzed: ApiProspect = await response.json();
       setProspects(prev => prev.map(p => p.id === id ? fromApiProspect(analyzed) : p));
+      setErrorMessage(null);
     } catch (error) {
       console.error(error);
+      setErrorMessage("Analyse IA impossible. Vérifiez qu'Ollama est lancé et que le modèle sélectionné existe.");
+      setAiOnline(false);
       setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "new" } : p));
     }
   };
@@ -175,7 +215,7 @@ export default function App() {
       const response = await fetch(`${API_BASE_URL}/prospects/${id}/generate-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: aiSettings.model }),
+        body: JSON.stringify({ model: aiSettings.model, tone }),
       });
       if (!response.ok) throw new Error("Unable to generate message");
       const generated: ApiProspect = await response.json();
@@ -186,8 +226,11 @@ export default function App() {
         messageType: type,
         messageTone: tone,
       } : p));
+      setErrorMessage(null);
     } catch (error) {
       console.error(error);
+      setErrorMessage("Génération du message impossible. Vérifiez qu'Ollama est lancé et que le modèle sélectionné existe.");
+      setAiOnline(false);
       setProspects(prev => prev.map(p => p.id === id ? { ...p, status: "analyzed" } : p));
     }
   };
@@ -217,6 +260,12 @@ export default function App() {
           </div>
           <div />
         </div>
+        {errorMessage && (
+          <div style={{ minHeight: 38, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "8px 22px", background: "rgba(255,77,106,0.09)", borderBottom: "1px solid rgba(255,77,106,0.16)", color: "#FFB3C0", fontSize: 12.5, flexShrink: 0 }}>
+            <span>{errorMessage}</span>
+            <button onClick={() => setErrorMessage(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6, color: "#FFB3C0", padding: "4px 9px", fontSize: 11.5, cursor: "pointer" }}>Fermer</button>
+          </div>
+        )}
 
         {/* Page */}
         <div style={{ flex: 1, overflow: "hidden" }}>

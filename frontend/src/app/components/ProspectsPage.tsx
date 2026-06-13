@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, Brain, MessageSquare, Check, X, Copy, Edit3, Loader, Trash2, Archive, Upload, Users } from "lucide-react";
+import { Plus, Search, Brain, MessageSquare, Check, X, Copy, Edit3, Loader, Trash2, Upload, Users } from "lucide-react";
 import type { Prospect, ProspectStatus, MessageTone, MessageType } from "../types";
 
 interface Props {
@@ -253,9 +253,6 @@ export function ProspectsPage({ prospects, onUpdate, onAdd, onDelete, onAnalyze,
               </div>
             </div>
             <div style={{ display: "flex", gap: 6 }}>
-              <button onClick={() => onUpdate(selected.id, { status: "archived" })} title="Archiver" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 7, padding: "6px 10px", cursor: "pointer", color: "#4A5568", display: "flex", alignItems: "center" }}>
-                <Archive size={13} />
-              </button>
               <button onClick={() => onDelete(selected.id)} title="Supprimer" style={{ background: "rgba(255,77,106,0.08)", border: "1px solid rgba(255,77,106,0.15)", borderRadius: 7, padding: "6px 10px", cursor: "pointer", color: "#FF4D6A", display: "flex", alignItems: "center" }}>
                 <Trash2 size={13} />
               </button>

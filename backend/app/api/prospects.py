@@ -110,7 +110,10 @@ async def analyze_prospect(
     if db_prospect is None:
         raise HTTPException(status_code=404, detail="Prospect not found")
 
-    analysis = await run_ai_analysis(db_prospect, model=request.model if request else None)
+    try:
+        analysis = await run_ai_analysis(db_prospect, model=request.model if request else None)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     updated = crud.update_prospect(
         db,
         db_prospect,
@@ -135,7 +138,14 @@ async def generate_prospect_message(
     if db_prospect is None:
         raise HTTPException(status_code=404, detail="Prospect not found")
 
-    messages = await run_message_generation(db_prospect, model=request.model if request else None)
+    try:
+        messages = await run_message_generation(
+            db_prospect,
+            model=request.model if request else None,
+            tone=request.tone if request else None,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     updated = crud.update_prospect(
         db,
         db_prospect,

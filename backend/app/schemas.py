@@ -53,6 +53,7 @@ class GeneratedMessages(BaseModel):
 
 class AIRequest(BaseModel):
     model: str | None = Field(default=None, max_length=100)
+    tone: str | None = Field(default=None, pattern="^(professionnel|amical|direct|chaleureux)$")
 
 
 class ProspectHistoryRead(BaseModel):

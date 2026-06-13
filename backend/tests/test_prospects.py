@@ -112,7 +112,11 @@ def test_ai_analysis_and_message_generation_flow(monkeypatch) -> None:
             category="Hot",
         )
 
-    async def fake_messages(prospect, model=None):
+    seen_generation_args = {}
+
+    async def fake_messages(prospect, model=None, tone=None):
+        seen_generation_args["model"] = model
+        seen_generation_args["tone"] = tone
         first_name = prospect.name.split(" ")[0]
         return GeneratedMessages(
             dm_message=f"Salut {first_name}, message DM personnalise.",
@@ -142,8 +146,12 @@ def test_ai_analysis_and_message_generation_flow(monkeypatch) -> None:
     assert analyzed["score"] in range(0, 11)
     assert analyzed["category"] in {"Hot", "Warm", "Cold"}
 
-    message_response = client.post(f"/prospects/{prospect_id}/generate-message")
+    message_response = client.post(
+        f"/prospects/{prospect_id}/generate-message",
+        json={"model": "qwen2.5:1.5b", "tone": "direct"},
+    )
     assert message_response.status_code == 200
+    assert seen_generation_args == {"model": "qwen2.5:1.5b", "tone": "direct"}
     with_messages = message_response.json()
     assert with_messages["status"] == "draft"
     assert "Claire" in with_messages["dm_message"]

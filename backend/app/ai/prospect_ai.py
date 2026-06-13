@@ -18,36 +18,12 @@ def _extract_json(text: str) -> dict:
         return json.loads(match.group(0))
 
 
-def _fallback_analysis(prospect: Prospect) -> ProspectAnalysis:
-    bio_length = len(prospect.bio or "")
-    score = 7 if bio_length > 180 else 5 if bio_length > 80 else 3
-    category = "Hot" if score >= 8 else "Warm" if score >= 5 else "Cold"
-    company = f" at {prospect.company}" if prospect.company else ""
-    return ProspectAnalysis(
-        summary=f"{prospect.name}{company} looks like a {category.lower()} prospect based on the available bio.",
-        score=score,
-        category=category,
-    )
-
-
-def _fallback_messages(prospect: Prospect) -> GeneratedMessages:
-    first_name = prospect.name.split(" ")[0]
-    company_part = f" chez {prospect.company}" if prospect.company else ""
-    return GeneratedMessages(
-        dm_message=(
-            f"Salut {first_name}, j'ai vu ton profil{company_part}. "
-            "Je pense qu'il y a peut-etre un angle interessant pour te faire gagner du temps sur ta prospection. "
-            "Ouvert a en discuter rapidement ?"
-        ),
-        email_message=(
-            f"Bonjour {first_name},\n\n"
-            f"Je me permets de vous contacter apres avoir regarde votre profil{company_part}.\n\n"
-            "Je pense qu'il peut y avoir un levier concret pour simplifier votre prospection et gagner du temps "
-            "sur les messages personnalises.\n\n"
-            "Seriez-vous ouvert a un court echange cette semaine ?\n\n"
-            "Bonne journee,"
-        ),
-    )
+TONE_INSTRUCTIONS = {
+    "professionnel": "Use a clear, professional tone.",
+    "amical": "Use a friendly and approachable tone.",
+    "direct": "Use a concise, direct tone without sounding aggressive.",
+    "chaleureux": "Use a warm and human tone.",
+}
 
 
 async def analyze_prospect(prospect: Prospect, model: str | None = None) -> ProspectAnalysis:
@@ -69,11 +45,18 @@ Source: {prospect.source or "Unknown"}
         response = await ollama_client.generate(prompt, model=model, num_predict=180, temperature=0.2)
         payload = _extract_json(response)
         return ProspectAnalysis(**payload)
-    except (httpx.HTTPError, json.JSONDecodeError, ValueError):
-        return _fallback_analysis(prospect)
+    except httpx.HTTPError as exc:
+        raise RuntimeError("Ollama is unavailable. Start Ollama and verify the selected model.") from exc
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise RuntimeError("Ollama returned an invalid analysis response.") from exc
 
 
-async def generate_messages(prospect: Prospect, model: str | None = None) -> GeneratedMessages:
+async def generate_messages(
+    prospect: Prospect,
+    model: str | None = None,
+    tone: str | None = None,
+) -> GeneratedMessages:
+    tone_instruction = TONE_INSTRUCTIONS.get(tone or "professionnel", TONE_INSTRUCTIONS["professionnel"])
     prompt = f"""
 Write two personalized outreach messages for this prospect.
 
@@ -83,6 +66,7 @@ email_message: concise email, natural, personalized
 
 Rules:
 - Use the prospect name.
+- {tone_instruction}
 - Do not pretend the message was sent.
 - Do not mention automation or scraping.
 - The user will review and edit before sending manually.
@@ -99,5 +83,7 @@ Category: {prospect.category or "Unknown"}
         response = await ollama_client.generate(prompt, model=model, num_predict=420, temperature=0.6)
         payload = _extract_json(response)
         return GeneratedMessages(**payload)
-    except (httpx.HTTPError, json.JSONDecodeError, ValueError):
-        return _fallback_messages(prospect)
+    except httpx.HTTPError as exc:
+        raise RuntimeError("Ollama is unavailable. Start Ollama and verify the selected model.") from exc
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise RuntimeError("Ollama returned an invalid message response.") from exc
