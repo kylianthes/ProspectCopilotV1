@@ -104,6 +104,30 @@ def test_import_csv_requires_name_and_bio_columns() -> None:
     assert response.json()["detail"] == "Missing required columns: bio"
 
 
+def test_extension_import_creates_prospect_and_avoids_duplicates() -> None:
+    payload = {
+        "username": "alice.sales",
+        "display_name": "Alice Sales",
+        "bio": "Founder sharing visible sales tips.",
+        "source": "instagram",
+        "profile_url": "https://www.instagram.com/alice.sales/",
+    }
+
+    response = client.post("/extension/prospects", json=payload)
+
+    assert response.status_code == 201
+    created = response.json()
+    assert created["name"] == "Alice Sales"
+    assert created["source"] == "instagram:@alice.sales"
+    assert "https://www.instagram.com/alice.sales/" in created["bio"]
+
+    duplicate_response = client.post("/extension/prospects", json=payload)
+
+    assert duplicate_response.status_code == 201
+    assert duplicate_response.json()["id"] == created["id"]
+    assert len(client.get("/prospects").json()) == 1
+
+
 def test_ai_analysis_and_message_generation_flow(monkeypatch) -> None:
     async def fake_analysis(prospect, model=None):
         return ProspectAnalysis(

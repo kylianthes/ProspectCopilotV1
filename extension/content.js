@@ -1,5 +1,5 @@
 (function () {
-  const API_URL = "http://127.0.0.1:8000/prospects";
+  const API_URL = "http://127.0.0.1:8000/extension/prospects";
   const BUTTON_ID = "prospect-copilot-add-button";
   const TOAST_ID = "prospect-copilot-toast";
 
@@ -67,11 +67,11 @@
     const bio = description || visibleHeader || "Bio visible non détectée.";
 
     return {
-      platform: "Instagram",
+      source: "instagram",
       username,
-      displayName: parseInstagramTitle(username),
+      display_name: parseInstagramTitle(username),
       bio,
-      url: location.href.split("?")[0]
+      profile_url: location.href.split("?")[0]
     };
   }
 
@@ -88,11 +88,11 @@
       "Bio visible non détectée.";
 
     return {
-      platform: "TikTok",
+      source: "tiktok",
       username,
-      displayName: displayName === username && subtitle ? subtitle : displayName,
+      display_name: displayName === username && subtitle ? subtitle : displayName,
       bio,
-      url: location.href.split("?")[0]
+      profile_url: location.href.split("?")[0]
     };
   }
 
@@ -101,21 +101,35 @@
     return platform() === "instagram" ? extractInstagramProfile() : extractTikTokProfile();
   }
 
-  function profileToProspect(profile) {
-    const username = profile.username ? `@${profile.username.replace(/^@/, "")}` : "inconnu";
-    const bioLines = [
-      `Profil ${profile.platform}`,
-      `Username: ${username}`,
-      `Bio: ${profile.bio}`,
-      `URL: ${profile.url}`
-    ];
+  function buildDeepLink(profile) {
+    const params = new URLSearchParams({
+      username: profile.username,
+      display_name: profile.display_name || "",
+      bio: profile.bio,
+      source: profile.source,
+      profile_url: profile.profile_url
+    });
 
-    return {
-      name: profile.displayName || profile.username || "Profil sans nom",
-      company: null,
-      bio: bioLines.join("\n"),
-      source: `${profile.platform.toLowerCase()}:${username}`
-    };
+    return `prospectcopilot://add-prospect?${params.toString()}`;
+  }
+
+  async function sendFallback(profile) {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile)
+    });
+
+    if (!response.ok) {
+      const detail = await response.json().catch(() => null);
+      throw new Error(detail?.detail || "Impossible d'ajouter le prospect.");
+    }
+
+    return response.json();
+  }
+
+  function openDeepLink(profile) {
+    window.location.href = buildDeepLink(profile);
   }
 
   function showToast(message, type) {
@@ -151,24 +165,24 @@
     }
 
     const confirmed = window.confirm(
-      `Ajouter ${profile.displayName || profile.username} à Prospect Copilot ?`
+      `Ajouter ${profile.display_name || profile.username} à Prospect Copilot ?`
     );
     if (!confirmed) return { ok: false, cancelled: true };
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profileToProspect(profile))
-    });
+    openDeepLink(profile);
 
-    if (!response.ok) {
-      const detail = await response.json().catch(() => null);
-      throw new Error(detail?.detail || "Impossible d'ajouter le prospect.");
+    try {
+      const created = await new Promise((resolve, reject) => {
+        window.setTimeout(() => {
+          sendFallback(profile).then(resolve).catch(reject);
+        }, 2500);
+      });
+      showToast("Prospect ajouté à Prospect Copilot.", "success");
+      return { ok: true, prospect: created };
+    } catch (error) {
+      showToast("Prospect envoyé à Prospect Copilot. Si rien ne s'ouvre, lance l'application puis réessaie.", "success");
+      return { ok: true, deepLinkOnly: true };
     }
-
-    const created = await response.json();
-    showToast("Prospect ajouté à Prospect Copilot.", "success");
-    return { ok: true, prospect: created };
   }
 
   function ensureButton() {

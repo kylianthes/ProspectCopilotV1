@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { Sidebar } from "./components/Sidebar";
 import { DashboardPage } from "./components/DashboardPage";
 import { ProspectsPage } from "./components/ProspectsPage";
@@ -58,6 +59,7 @@ export default function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [aiOnline, setAiOnline] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const loadProspects = async () => {
     const response = await fetch(`${API_BASE_URL}/prospects`);
@@ -81,6 +83,34 @@ export default function App() {
     const interval = window.setInterval(checkAiHealth, 10000);
     return () => window.clearInterval(interval);
   }, [aiSettings.model]);
+
+  useEffect(() => {
+    if (!("__TAURI_INTERNALS__" in window)) return;
+
+    let cleanup: (() => void) | undefined;
+    let cleanupError: (() => void) | undefined;
+
+    listen<{ message: string }>("prospect-copilot://prospect-added", event => {
+      setSuccessMessage(event.payload.message || "Prospect ajouté.");
+      setErrorMessage(null);
+      setPage("prospects");
+      loadProspects().catch(() => setErrorMessage("Prospect ajouté, mais rechargement impossible."));
+    }).then(unlisten => {
+      cleanup = unlisten;
+    }).catch(() => undefined);
+
+    listen<{ message: string }>("prospect-copilot://prospect-add-error", event => {
+      setErrorMessage(event.payload.message || "Import navigateur impossible.");
+      setSuccessMessage(null);
+    }).then(unlisten => {
+      cleanupError = unlisten;
+    }).catch(() => undefined);
+
+    return () => {
+      cleanup?.();
+      cleanupError?.();
+    };
+  }, []);
 
   const saveSettings = (settings: AISettings) => {
     setAiSettings(settings);
@@ -264,6 +294,12 @@ export default function App() {
           <div style={{ minHeight: 38, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "8px 22px", background: "rgba(255,77,106,0.09)", borderBottom: "1px solid rgba(255,77,106,0.16)", color: "#FFB3C0", fontSize: 12.5, flexShrink: 0 }}>
             <span>{errorMessage}</span>
             <button onClick={() => setErrorMessage(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6, color: "#FFB3C0", padding: "4px 9px", fontSize: 11.5, cursor: "pointer" }}>Fermer</button>
+          </div>
+        )}
+        {successMessage && (
+          <div style={{ minHeight: 38, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "8px 22px", background: "rgba(0,255,163,0.08)", borderBottom: "1px solid rgba(0,255,163,0.16)", color: "#9FFFD9", fontSize: 12.5, flexShrink: 0 }}>
+            <span>{successMessage}</span>
+            <button onClick={() => setSuccessMessage(null)} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6, color: "#9FFFD9", padding: "4px 9px", fontSize: 11.5, cursor: "pointer" }}>Fermer</button>
           </div>
         )}
 

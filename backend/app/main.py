@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.ai import router as ai_router
+from app.api.extension import router as extension_router
 from app.api.prospects import router as prospects_router
 from app.database import init_db
 
@@ -37,3 +38,4 @@ def health() -> dict[str, str]:
 
 app.include_router(prospects_router)
 app.include_router(ai_router)
+app.include_router(extension_router)

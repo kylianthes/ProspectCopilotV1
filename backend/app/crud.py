@@ -23,6 +23,11 @@ def get_prospect(db: Session, prospect_id: int) -> Prospect | None:
     return db.get(Prospect, prospect_id)
 
 
+def get_prospect_by_source(db: Session, source: str) -> Prospect | None:
+    statement = select(Prospect).where(Prospect.source == source)
+    return db.scalars(statement).first()
+
+
 def update_prospect(
     db: Session,
     db_prospect: Prospect,
